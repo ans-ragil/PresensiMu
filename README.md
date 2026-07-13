@@ -21,6 +21,12 @@ Sistem absensi online berbasis web untuk mengelola kehadiran karyawan dengan fit
 - **Manajemen Jadwal** — shift, import Excel
 - **Manajemen Cuti** — approve/reject pengajuan
 
+### Roles (RBAC)
+- **Super Admin** — full access ke semua fitur admin
+- **HR** — akses fitur admin (karyawan, absensi, cuti, laporan)
+- **Admin** — akses fitur admin dasar
+- **Employee** — akses ESS (dashboard, absensi, riwayat, jadwal, cuti, profil)
+
 ## Tech Stack
 
 - **Backend:** Node.js + Express + TypeScript + Prisma
@@ -224,6 +230,8 @@ cd server && npm start
 
 | Role | Email | Password |
 |------|-------|----------|
+| Super Admin | superadmin@presensimu.com | superadmin123 |
+| HR | hr@presensimu.com | hr123 |
 | Admin | admin@presensimu.com | admin123 |
 | Karyawan | karyawan@presensimu.com | karyawan123 |
 

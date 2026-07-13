@@ -3,13 +3,13 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const navItems = [
-  { path: '/dashboard', label: 'Beranda', icon: HomeIcon },
-  { path: '/attendance', label: 'Absensi', icon: ClipboardIcon },
-  { path: '/history', label: 'Riwayat', icon: ChartIcon },
-  { path: '/schedule', label: 'Jadwal', icon: CalendarIcon },
-  { path: '/leave-history', label: 'Cuti', icon: UmbrellaIcon },
-  { path: '/notification', label: 'Notif', icon: BellIcon },
-  { path: '/profile', label: 'Profil', icon: UserIcon },
+  { path: '/employee/dashboard', label: 'Beranda', icon: HomeIcon },
+  { path: '/employee/attendance', label: 'Absensi', icon: ClipboardIcon },
+  { path: '/employee/history', label: 'Riwayat', icon: ChartIcon },
+  { path: '/employee/schedule', label: 'Jadwal', icon: CalendarIcon },
+  { path: '/employee/leave-history', label: 'Cuti', icon: UmbrellaIcon },
+  { path: '/employee/notification', label: 'Notif', icon: BellIcon },
+  { path: '/employee/profile', label: 'Profil', icon: UserIcon },
 ];
 
 export default function EmployeeLayout({ children }: { children: ReactNode }) {
@@ -21,11 +21,11 @@ export default function EmployeeLayout({ children }: { children: ReactNode }) {
       {/* Top Header */}
       <header className="bg-white shadow-sm border-b sticky top-0 z-40">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
-          <Link to="/dashboard" className="flex items-center gap-2">
+          <Link to="/employee/dashboard" className="flex items-center gap-2">
             <span className="text-xl font-bold text-blue-600">Absensi</span>
           </Link>
           <div className="flex items-center gap-3">
-            {user?.role === 'ADMIN' && (
+            {['ADMIN', 'HR', 'SUPER_ADMIN'].includes(user?.role || '') && (
               <Link to="/admin/dashboard" className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full hover:bg-purple-200">Admin</Link>
             )}
             <button onClick={logout} className="text-sm text-gray-500 hover:text-red-500">Keluar</button>

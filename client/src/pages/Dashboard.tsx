@@ -10,12 +10,12 @@ import SectionHeader from '../components/SectionHeader';
 import type { DashboardData } from '../types';
 
 const quickMenuItems = [
-  { to: '/attendance', label: 'Absensi', bg: 'bg-blue-100', iconColor: 'text-blue-500', icon: ClockIcon },
-  { to: '/history', label: 'Riwayat', bg: 'bg-emerald-100', iconColor: 'text-emerald-500', icon: ChartIcon },
-  { to: '/schedule', label: 'Jadwal', bg: 'bg-violet-100', iconColor: 'text-violet-500', icon: CalendarIcon },
-  { to: '/leave-history', label: 'Cuti', bg: 'bg-amber-100', iconColor: 'text-amber-500', icon: UmbrellaIcon },
-  { to: '/leave-request', label: 'Izin', bg: 'bg-rose-100', iconColor: 'text-rose-500', icon: FileIcon },
-  { to: '/schedule', label: 'Profile', bg: 'bg-slate-100', iconColor: 'text-slate-500', icon: UserIcon },
+  { to: '/employee/attendance', label: 'Absensi', bg: 'bg-blue-100', iconColor: 'text-blue-500', icon: ClockIcon },
+  { to: '/employee/history', label: 'Riwayat', bg: 'bg-emerald-100', iconColor: 'text-emerald-500', icon: ChartIcon },
+  { to: '/employee/schedule', label: 'Jadwal', bg: 'bg-violet-100', iconColor: 'text-violet-500', icon: CalendarIcon },
+  { to: '/employee/leave-history', label: 'Cuti', bg: 'bg-amber-100', iconColor: 'text-amber-500', icon: UmbrellaIcon },
+  { to: '/employee/leave-request', label: 'Izin', bg: 'bg-rose-100', iconColor: 'text-rose-500', icon: FileIcon },
+  { to: '/employee/profile', label: 'Profile', bg: 'bg-slate-100', iconColor: 'text-slate-500', icon: UserIcon },
 ];
 
 const statColors: Record<string, string> = {
@@ -194,7 +194,7 @@ export default function Dashboard() {
           <div className="text-center py-4">
             <p className="text-sm text-gray-500">Belum ada absensi hari ini</p>
             <Link
-              to="/attendance"
+              to="/employee/attendance"
               className="inline-flex items-center gap-1 mt-2 text-sm text-blue-600 font-medium hover:text-blue-700"
             >
               Clock In Sekarang
@@ -287,7 +287,7 @@ export default function Dashboard() {
           <SectionHeader
             title="Pengajuan Pending"
             action={
-              <Link to="/leave-history" className="text-xs text-blue-600 hover:text-blue-700">
+              <Link to="/employee/leave-history" className="text-xs text-blue-600 hover:text-blue-700">
                 Lihat Semua
               </Link>
             }

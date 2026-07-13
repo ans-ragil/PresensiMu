@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 
+export const ADMIN_ROLES = ['ADMIN', 'HR', 'SUPER_ADMIN'];
+
 export const rbacMiddleware = (allowedRoles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const user = (req as any).user;
@@ -21,3 +23,6 @@ export const rbacMiddleware = (allowedRoles: string[]) => {
     next();
   };
 };
+
+// Convenience middleware: allows ADMIN, HR, SUPER_ADMIN
+export const adminOnly = rbacMiddleware(ADMIN_ROLES);

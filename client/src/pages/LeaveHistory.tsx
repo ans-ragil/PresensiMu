@@ -71,7 +71,7 @@ const LeaveHistory = () => {
     <div className="p-4 space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-gray-900">Riwayat Cuti</h1>
-        <Link to="/leave-request" className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 transition-colors">
+        <Link to="/employee/leave-request" className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 transition-colors">
           + Ajukan
         </Link>
       </div>
@@ -120,7 +120,7 @@ const LeaveHistory = () => {
               </svg>
             </div>
             <p className="text-gray-500 text-sm">Tidak ada data</p>
-            <Link to="/leave-request" className="mt-2 inline-block text-blue-600 hover:text-blue-700 text-sm font-medium">Ajukan cuti sekarang</Link>
+            <Link to="/employee/leave-request" className="mt-2 inline-block text-blue-600 hover:text-blue-700 text-sm font-medium">Ajukan cuti sekarang</Link>
           </div>
         ) : (
           filteredLeaves.map(leave => {

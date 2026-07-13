@@ -1,11 +1,15 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth, UserRole } from '../contexts/AuthContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  allowedRoles?: ('EMPLOYEE' | 'ADMIN')[];
+  allowedRoles?: UserRole[];
 }
+
+const ADMIN_ROLES: UserRole[] = ['ADMIN', 'HR', 'SUPER_ADMIN'];
+
+export const isAdminRole = (role: UserRole): boolean => ADMIN_ROLES.includes(role);
 
 const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -23,7 +27,7 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
   }
 
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={isAdminRole(user.role) ? '/admin/dashboard' : '/employee/dashboard'} replace />;
   }
 
   return <>{children}</>;

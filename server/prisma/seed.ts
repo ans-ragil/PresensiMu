@@ -6,6 +6,58 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Seeding database...');
 
+  // Create super admin user
+  const superAdminEmail = 'superadmin@presensimu.com';
+  const superAdminPassword = 'superadmin123';
+
+  const existingSuperAdmin = await prisma.user.findUnique({
+    where: { email: superAdminEmail }
+  });
+
+  if (!existingSuperAdmin) {
+    const hashedPassword = await bcrypt.hash(superAdminPassword, 10);
+    await prisma.user.create({
+      data: {
+        nama: 'Super Administrator',
+        email: superAdminEmail,
+        password: hashedPassword,
+        role: 'SUPER_ADMIN',
+        noTelp: '081234567888',
+        jabatan: 'Super Admin',
+        divisi: 'IT',
+      }
+    });
+    console.log(`Super Admin user created: ${superAdminEmail}`);
+  } else {
+    console.log(`Super Admin user already exists: ${superAdminEmail}`);
+  }
+
+  // Create HR user
+  const hrEmail = 'hr@presensimu.com';
+  const hrPassword = 'hr123';
+
+  const existingHR = await prisma.user.findUnique({
+    where: { email: hrEmail }
+  });
+
+  if (!existingHR) {
+    const hashedPassword = await bcrypt.hash(hrPassword, 10);
+    await prisma.user.create({
+      data: {
+        nama: 'HR Manager',
+        email: hrEmail,
+        password: hashedPassword,
+        role: 'HR',
+        noTelp: '081234567877',
+        jabatan: 'HR Manager',
+        divisi: 'Human Resources',
+      }
+    });
+    console.log(`HR user created: ${hrEmail}`);
+  } else {
+    console.log(`HR user already exists: ${hrEmail}`);
+  }
+
   // Create admin user
   const adminEmail = 'admin@presensimu.com';
   const adminPassword = 'admin123';
@@ -16,7 +68,6 @@ async function main() {
 
   if (!existingAdmin) {
     const hashedPassword = await bcrypt.hash(adminPassword, 10);
-    
     await prisma.user.create({
       data: {
         nama: 'Administrator',
@@ -26,7 +77,6 @@ async function main() {
         noTelp: '081234567890'
       }
     });
-
     console.log(`Admin user created: ${adminEmail}`);
   } else {
     console.log(`Admin user already exists: ${adminEmail}`);
@@ -42,7 +92,6 @@ async function main() {
 
   if (!existingEmployee) {
     const hashedPassword = await bcrypt.hash(employeePassword, 10);
-    
     await prisma.user.create({
       data: {
         nama: 'Sample Karyawan',
@@ -52,7 +101,6 @@ async function main() {
         noTelp: '081234567891'
       }
     });
-
     console.log(`Employee user created: ${employeeEmail}`);
   } else {
     console.log(`Employee user already exists: ${employeeEmail}`);

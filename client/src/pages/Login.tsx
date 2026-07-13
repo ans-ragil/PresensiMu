@@ -17,7 +17,12 @@ const Login = () => {
 
     try {
       await login(email, password);
-      navigate('/dashboard');
+      // Fetch user data to determine redirect
+      const api = (await import('../services/api')).default;
+      const response = await api.get('/auth/me');
+      const userData = response.data.data;
+      const isAdminRole = ['ADMIN', 'HR', 'SUPER_ADMIN'].includes(userData.role);
+      navigate(isAdminRole ? '/admin/dashboard' : '/employee/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Terjadi kesalahan saat login');
     } finally {

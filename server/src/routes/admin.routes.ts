@@ -5,14 +5,14 @@ import { scheduleController } from '../controllers/schedule.controller';
 import { trackingController } from '../controllers/tracking.controller';
 import { reportController } from '../controllers/report.controller';
 import { authMiddleware } from '../middleware/auth';
-import { rbacMiddleware } from '../middleware/rbac';
+import { rbacMiddleware, ADMIN_ROLES } from '../middleware/rbac';
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-// All routes require authentication and ADMIN role
+// All routes require authentication and ADMIN/HR/SUPER_ADMIN role
 router.use(authMiddleware);
-router.use(rbacMiddleware(['ADMIN']));
+router.use(rbacMiddleware(ADMIN_ROLES));
 
 // Dashboard
 router.get('/dashboard', adminController.getDashboard);

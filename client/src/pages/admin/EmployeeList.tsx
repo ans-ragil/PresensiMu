@@ -57,7 +57,7 @@ const EmployeeList = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Daftar Karyawan</h1>
         <Link
-          to="/admin/schedule-management"
+          to="/admin/schedule"
           className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700"
         >
           Kelola Jadwal
@@ -110,7 +110,7 @@ const EmployeeList = () => {
                     </td>
                     <td className="px-6 py-4">
                       <Link
-                        to={`/admin/schedule-management?userId=${employee.id}`}
+                        to={`/admin/schedule?userId=${employee.id}`}
                         className="text-sm text-blue-600 hover:text-blue-700"
                       >
                         Lihat Jadwal

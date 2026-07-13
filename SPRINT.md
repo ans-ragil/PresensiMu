@@ -392,6 +392,22 @@
 - [x] TypeScript: clean compilation (frontend + backend)
 - [x] Security: JWT auth, RBAC, password validation, photo upload limit
 
+### Admin Dashboard - Layout & RBAC Foundation (2026-07-13)
+- [x] Install Material UI (@mui/material, @mui/icons-material, @emotion/react, @emotion/styled)
+- [x] Add new roles: SUPER_ADMIN, HR (alongside existing ADMIN, EMPLOYEE)
+- [x] AdminLayout rewrite with Material UI: collapsible sidebar, top navbar, profile menu, responsive drawer
+- [x] Role-based routing: /employee/* for employees, /admin/* for admin/HR/super admin
+- [x] Backward compatibility redirects (old routes → new routes)
+- [x] Login redirect based on role (employee→/employee/dashboard, admin→/admin/dashboard)
+- [x] ProtectedRoute with isAdminRole helper and role-aware redirect
+- [x] Backend RBAC: ADMIN_ROLES constant, adminOnly middleware
+- [x] Admin routes updated to allow ADMIN, HR, SUPER_ADMIN
+- [x] Seed data: Super Admin + HR accounts
+- [x] TypeScript: clean compilation (frontend + backend)
+- [x] Unit tests: 121/121 pass
+- [x] Admin sidebar menu: Dashboard, Manajemen Karyawan, Absensi, Jadwal Kerja, Persetujuan Cuti, Laporan, Live Tracking, Lokasi Kantor, Pengaturan Email
+- **Next:** Admin Dashboard content implementation
+
 ---
 
 ## Risk & Mitigation

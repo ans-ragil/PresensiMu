@@ -262,3 +262,55 @@ Agent Coding AI wajib patuhi aturan ini
   - Password change validates current password
   - Profile photo upload max 2MB
 - **Final Status:** Application ready for deployment
+
+### 2026-07-13: Admin Dashboard - Layout & RBAC Foundation
+- **Status:** Selesai
+- **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Setup struktur Admin Dashboard dengan Material UI, role-based routing, dan RBAC 3 level (Super Admin, HR, Employee)
+- **Files Created (0):** (no new files, only modifications)
+- **Files Updated (10):**
+  - `client/package.json` — added @mui/material, @mui/icons-material, @emotion/react, @emotion/styled
+  - `client/src/App.tsx` — restructured routes: `/employee/*` prefix for employee, `/admin/*` for admin, backward compatibility redirects, role-based PublicRoute redirect
+  - `client/src/contexts/AuthContext.tsx` — added UserRole type (EMPLOYEE, ADMIN, HR, SUPER_ADMIN), updated User interface
+  - `client/src/components/ProtectedRoute.tsx` — added isAdminRole helper, role-aware redirect
+  - `client/src/components/AdminLayout.tsx` — complete rewrite with Material UI: collapsible sidebar with gradient logo, top navbar with profile/menu/notifications, responsive mobile drawer, modern SVG icons
+  - `client/src/components/EmployeeLayout.tsx` — updated nav paths to `/employee/*`, role check for admin badge
+  - `client/src/pages/Login.tsx` — role-based redirect (employee→/employee/dashboard, admin→/admin/dashboard)
+  - `client/src/pages/Dashboard.tsx` — updated internal links to `/employee/*` prefix
+  - `client/src/pages/LeaveHistory.tsx` — updated links to `/employee/*` prefix
+  - `client/src/pages/LeaveRequest.tsx` — updated links to `/employee/*` prefix
+  - `client/src/pages/admin/Dashboard.tsx` — updated links from `/admin/schedule-management` to `/admin/schedule`
+  - `client/src/pages/admin/EmployeeList.tsx` — updated links from `/admin/schedule-management` to `/admin/schedule`
+  - `server/src/middleware/rbac.ts` — added ADMIN_ROLES constant, exported adminOnly convenience middleware
+  - `server/src/routes/admin.routes.ts` — updated to allow ADMIN, HR, SUPER_ADMIN roles
+  - `server/prisma/seed.ts` — added Super Admin and HR seed accounts
+- **New Roles:**
+  - SUPER_ADMIN: superadmin@presensimu.com / superadmin123
+  - HR: hr@presensimu.com / hr123
+  - ADMIN: admin@presensimu.com / admin123 (existing)
+  - EMPLOYEE: karyawan@presensimu.com / karyawan123 (existing)
+- **QA Test:** TypeScript compilation clean (frontend + backend), 121 backend tests pass
+- **Security Test:**
+  - RBAC: ADMIN/HR/SUPER_ADMIN can access admin routes
+  - Employee cannot access admin routes (403)
+  - Registration still creates EMPLOYEE only (security fix preserved)
+  - Login redirects based on role
+- **Files Changed Summary:**
+  | File | Reason |
+  |------|--------|
+  | `client/package.json` | Add Material UI dependencies |
+  | `client/src/App.tsx` | Role-based routing with /employee/ and /admin/ prefixes |
+  | `client/src/contexts/AuthContext.tsx` | Add UserRole type (SUPER_ADMIN, HR) |
+  | `client/src/components/ProtectedRoute.tsx` | Role-aware redirect + isAdminRole helper |
+  | `client/src/components/AdminLayout.tsx` | Complete rewrite with Material UI sidebar/topbar |
+  | `client/src/components/EmployeeLayout.tsx` | Update nav paths to /employee/* |
+  | `client/src/pages/Login.tsx` | Role-based redirect after login |
+  | `client/src/pages/Dashboard.tsx` | Update links to /employee/* prefix |
+  | `client/src/pages/LeaveHistory.tsx` | Update links to /employee/* prefix |
+  | `client/src/pages/LeaveRequest.tsx` | Update links to /employee/* prefix |
+  | `client/src/pages/admin/Dashboard.tsx` | Update link to /admin/schedule |
+  | `client/src/pages/admin/EmployeeList.tsx` | Update links to /admin/schedule |
+  | `server/src/middleware/rbac.ts` | Add ADMIN_ROLES constant + adminOnly middleware |
+  | `server/src/routes/admin.routes.ts` | Allow HR/SUPER_ADMIN access |
+  | `server/prisma/seed.ts` | Add Super Admin + HR seed accounts |
+- **Next:** Admin Dashboard content implementation

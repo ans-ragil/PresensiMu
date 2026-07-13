@@ -1,11 +1,13 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import api from '../services/api';
 
+export type UserRole = 'EMPLOYEE' | 'ADMIN' | 'HR' | 'SUPER_ADMIN';
+
 interface User {
   id: string;
   nama: string;
   email: string;
-  role: 'EMPLOYEE' | 'ADMIN';
+  role: UserRole;
   noTelp: string | null;
   nik: string | null;
   jabatan: string | null;
@@ -29,7 +31,7 @@ interface RegisterData {
   email: string;
   password: string;
   noTelp?: string;
-  role?: 'EMPLOYEE' | 'ADMIN';
+  role?: UserRole;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

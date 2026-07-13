@@ -196,7 +196,7 @@ const AdminDashboard = () => {
         </Link>
 
         <Link
-          to="/admin/schedule-management"
+          to="/admin/schedule"
           className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
         >
           <div className="flex items-center gap-4">
