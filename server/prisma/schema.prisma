@@ -1,0 +1,126 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String          @id @default(uuid())
+  nama             String
+  email            String          @unique
+  password         String
+  role             String          @default("EMPLOYEE")
+  noTelp           String?
+  nik              String?
+  jabatan          String?
+  divisi           String?
+  alamat           String?
+  foto             String?
+  tanggalBergabung DateTime?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  attendance       Attendance[]
+  schedule         Schedule[]
+  leaveRequests    LeaveRequest[]  @relation("LeaveRequests")
+  approvedLeaves   LeaveRequest[]  @relation("ApprovedBy")
+  notifications    Notification[]
+}
+
+model Attendance {
+  id         String    @id @default(uuid())
+  userId     String
+  tanggal    DateTime
+  clockIn    DateTime?
+  clockOut   DateTime?
+  lokasiIn   String?
+  lokasiOut  String?
+  fotoIn     String?
+  fotoOut    String?
+  status     String    @default("ACTIVE")
+  keterangan String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tanggal])
+}
+
+model Schedule {
+  id             String   @id @default(uuid())
+  userId         String
+  hari           Int
+  jamMulai       String
+  jamSelesai     String
+  shiftType      String   @default("NORMAL")
+  toleransiMenit Int      @default(30)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, hari])
+}
+
+model LeaveRequest {
+  id              String   @id @default(uuid())
+  userId          String
+  tipeIzin        String
+  tanggalMulai    DateTime
+  tanggalSelesai  DateTime
+  keterangan      String?
+  bukti           String?
+  status          String   @default("PENDING")
+  approvedBy      String?
+  catatanAdmin    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation("LeaveRequests", fields: [userId], references: [id], onDelete: Cascade)
+  approver        User?    @relation("ApprovedBy", fields: [approvedBy], references: [id])
+}
+
+model Holiday {
+  id        String   @id @default(uuid())
+  nama      String
+  tanggal   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CompanyLocation {
+  id        String   @id @default(uuid())
+  nama      String
+  latitude  Float
+  longitude Float
+  radius    Int      @default(500)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EmailSetting {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  category  String   @default("SISTEM")
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+}

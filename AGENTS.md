@@ -1,0 +1,264 @@
+Agent Coding AI wajib patuhi aturan ini
+-selalu catat progres di setiap langkah.tambahkan dibagian paling bawah file ini
+-setiap pengerjaan sprint yang diinstruksikan oleh manusia (user) flow yang harus diikuti
+    - perencanaan->implementasi->qa test->security test->update docs
+-setiap promt yang aku kirim dan kamu jawab (kapanpun) diterminal, itu dianggap progres dan wajib dicatat
+
+---
+
+## Progres
+
+### 2026-07-01: Sprint Plan Created
+- **Status:** Selesai
+- **Detail:** Membuat sprint breakdown untuk Sistem Absensi Online Karyawan
+- **File:** `SPRINT.md` (6 sprint, 1 sprint = 1 minggu)
+- **Sprint Overview:**
+  - Sprint 1: Foundation & Authentication
+  - Sprint 2: Clock In/Out & Attendance
+  - Sprint 3: Leave Request & Admin Dashboard
+  - Sprint 4: Schedule Management & Shift
+  - Sprint 5: Live Tracking & Maps
+  - Sprint 6: Reports, Export & Finalization
+
+### 2026-07-01: Sprint 1 - Foundation & Authentication
+- **Status:** Selesai
+- **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Setup project structure, autentikasi (register, login, logout), RBAC, Docker
+- **Files Created (38 files):**
+  - Backend: `server/src/` (app.ts, routes, controllers, services, middleware, utils)
+  - Frontend: `client/src/` (App.tsx, pages, contexts, services, components)
+  - Infrastructure: docker-compose.yml, nginx/default.conf, Dockerfiles
+  - Config: package.json, tsconfig.json, prisma/schema.prisma
+- **Tech Stack:** Node.js + Express + TypeScript + Prisma + React + Vite + Tailwind
+- **QA Test:** TypeScript compilation clean, no errors
+- **Security Test:**
+  - Password: bcrypt 10 rounds
+  - JWT: 30m access, 7d refresh
+  - Rate limiting: 10 req/15min on auth endpoints
+  - CORS + Helmet security headers
+  - Generic error messages (no user enumeration)
+- **Next:** Sprint 2 - Clock In/Out & Attendance
+
+### 2026-07-01: Sprint 2 - Clock In/Out & Attendance
+- **Status:** Selesai
+- **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Clock in/out dengan GPS + selfie, dashboard, riwayat, jadwal
+- **Files Created (10 new):**
+  - Backend: `attendance.routes.ts`, `attendance.controller.ts`, `attendance.service.ts`, `location.ts`
+  - Frontend: `Attendance.tsx`, `History.tsx`, `Schedule.tsx`, `CameraCapture.tsx`, `StatusBadge.tsx`
+  - Updated: `schema.prisma` (Attendance + Schedule models)
+- **Database Models:** Attendance, Schedule
+- **API Endpoints:** 5 new (clock-in, clock-out, today, history, schedule)
+- **QA Test:** TypeScript compilation clean, no errors
+- **Security Test:**
+  - GPS validation (latitude/longitude required)
+  - Selfie size validation (max 2MB)
+  - User ID from JWT token (not request body)
+  - One clock in/out per day enforcement
+- **Next:** Sprint 3 - Leave Request & Admin Dashboard
+
+### 2026-07-01: Sprint 3 - Leave Request & Admin Dashboard
+- **Status:** Selesai
+- **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Pengajuan cuti/izin, dashboard admin, approve/reject cuti
+- **Files Created (12 new):**
+  - Backend: `leave.routes.ts`, `admin.routes.ts`, `leave.controller.ts`, `admin.controller.ts`, `leave.service.ts`, `admin.service.ts`
+  - Frontend: `LeaveRequest.tsx`, `LeaveHistory.tsx`, `Modal.tsx`, `admin/Dashboard.tsx`, `admin/LeaveManagement.tsx`, `admin/AdminAttendance.tsx`
+  - Updated: `schema.prisma` (LeaveRequest model), `app.ts`, `errorHandler.ts`, `App.tsx`, `Dashboard.tsx`
+- **Database Models:** LeaveRequest (with LeaveType and LeaveStatus enums)
+- **API Endpoints:** 9 new (leave-request CRUD, admin dashboard, admin leave management, admin attendance, admin employees)
+- **QA Test:** TypeScript compilation clean, no errors
+- **Security Test:**
+  - RBAC: Admin routes require ADMIN role
+  - Employee只能查看自己的数据
+  - Validasi tipe izin (hanya type yang diizinkan)
+  - Validasi tanggal (mulai <= selesai)
+  - Prevent overlapping leave requests
+  - Validasi ukuran bukti (max 2MB)
+- **Next:** Sprint 4 - Schedule Management & Shift
+
+### 2026-07-01: Sprint 4 - Schedule Management & Shift
+- **Status:** Selesai
+- **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Manajemen jadwal kerja, shift, import Excel, hari libur
+- **Files Created (4 new):**
+  - Backend: `schedule.service.ts`, `schedule.controller.ts`
+  - Frontend: `admin/ScheduleManagement.tsx`, `admin/EmployeeList.tsx`
+  - Updated: `schema.prisma` (Holiday model, toleransiMenit field), `admin.routes.ts`, `errorHandler.ts`, `App.tsx`, `admin/Dashboard.tsx`
+- **Database Models:** Holiday (new), Schedule (updated with toleransiMenit)
+- **API Endpoints:** 9 new (schedule CRUD, bulk assign, import, holiday CRUD)
+- **QA Test:** TypeScript compilation clean, no errors
+- **Security Test:**
+  - RBAC: All admin routes require ADMIN role
+  - File upload: multer memory storage
+  - Input validation: time format (HH:MM), hari range (0-6)
+  - Schedule validation: jamMulai < jamSelesai
+  - Holiday validation: prevent duplicate dates
+- **Next:** Sprint 5 - Live Tracking & Maps
+
+### 2026-07-01: Sprint 5 - Live Tracking & Maps
+- **Status:** Selesai
+- **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Live tracking karyawan dengan peta, history lokasi, validasi radius
+- **Files Created (4 new):**
+  - Backend: `tracking.service.ts`, `tracking.controller.ts`
+  - Frontend: `admin/LiveTracking.tsx`, `admin/CompanyLocation.tsx`
+  - Updated: `schema.prisma` (CompanyLocation model), `admin.routes.ts`, `errorHandler.ts`, `App.tsx`, `admin/Dashboard.tsx`, `utils/location.ts` (export Coordinates)
+- **Database Models:** CompanyLocation (new)
+- **API Endpoints:** 5 new (company-location CRUD, tracking live, tracking history, tracking alerts)
+- **QA Test:** TypeScript compilation clean, no errors
+- **Security Test:**
+  - RBAC: All admin routes require ADMIN role
+  - Only admins can view live tracking
+  - Employee locations not accessible by other employees
+  - Company location only configurable by admin
+- **Next:** Sprint 6 - Reports, Export & Finalization
+
+### 2026-07-01: Sprint 6 - Reports, Export & Finalization
+- **Status:** Selesai
+- **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Laporan, export Excel/PDF/CSV, email settings
+- **Files Created (6 new):**
+  - Backend: `report.service.ts`, `report.controller.ts`, `utils/export.ts`
+  - Frontend: `admin/Reports.tsx`, `admin/EmailSettings.tsx`
+  - Updated: `schema.prisma` (EmailSetting model), `admin.routes.ts`, `errorHandler.ts`, `App.tsx`, `admin/Dashboard.tsx`
+- **Database Models:** EmailSetting (new)
+- **API Endpoints:** 8 new (reports daily/weekly/monthly/employee/leave, export, email-settings CRUD)
+- **QA Test:** TypeScript compilation clean, no errors
+- **Security Test:**
+  - RBAC: All admin routes require ADMIN role
+  - Only admins can view reports
+  - Export files don't contain sensitive data
+  - Email settings protected by RBAC
+- **Next:** Project Complete - All 6 Sprints Done!
+
+### 2026-07-08: Daily Report Coverage Improvement
+- **Status:** Selesai
+- **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Menyempurnakan laporan harian agar mencakup seluruh karyawan, termasuk yang sedang cuti dan yang belum absen.
+- **Files Updated:** `server/src/services/report.service.ts`, `server/src/services/report.service.test.ts`
+- **QA Test:** `npm test` di folder server berhasil, 120 test lulus.
+- **Next:** Lanjutkan verifikasi alur end-to-end aplikasi.
+
+### 2026-07-08: UI/UX Overhaul - Navigation, Camera Fix, Layout System
+- **Status:** Selesai
+- **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Perbaikan menyeluruh UI/UX agar seperti sistem absensi pada umumnya. Masalah kritis: tidak ada navigasi di semua halaman, kamera tidak cleanup stream, tidak ada jam real-time, admin pages terisolasi.
+- **Files Created (2):**
+  - `client/src/components/EmployeeLayout.tsx` — shared layout dengan bottom nav bar (5 items: Beranda, Absensi, Riwayat, Jadwal, Cuti)
+  - `client/src/components/AdminLayout.tsx` — shared layout dengan responsive sidebar + hamburger menu (9 nav items)
+- **Files Updated (16):**
+  - `client/src/App.tsx` — routes wrapped dengan layout components
+  - `client/src/components/CameraCapture.tsx` — stream cleanup on unmount, 3 detik countdown timer, improved UI
+  - `client/src/pages/Dashboard.tsx` — real-time clock, card grid, 4 quick action buttons
+  - `client/src/pages/Attendance.tsx` — real-time clock, GPS watchPosition + refresh button, countdown camera
+  - `client/src/pages/History.tsx` — card-based list, auto-fetch on date change
+  - `client/src/pages/Schedule.tsx` — toleransiMenit display, Senin-Minggu order
+  - `client/src/pages/LeaveRequest.tsx` — tombol back, form lebih ringkas
+  - `client/src/pages/LeaveHistory.tsx` — filter tabs lebih bersih
+  - `client/src/pages/Register.tsx` — hapus role dropdown (security fix)
+  - `client/src/pages/admin/Dashboard.tsx` — removed wrapper, uses AdminLayout
+  - `client/src/pages/admin/LeaveManagement.tsx` — removed wrapper
+  - `client/src/pages/admin/AdminAttendance.tsx` — removed wrapper
+  - `client/src/pages/admin/ScheduleManagement.tsx` — removed wrapper
+  - `client/src/pages/admin/EmployeeList.tsx` — removed wrapper
+  - `client/src/pages/admin/Reports.tsx` — removed wrapper
+  - `client/src/pages/admin/LiveTracking.tsx` — removed wrapper
+  - `client/src/pages/admin/CompanyLocation.tsx` — removed wrapper
+  - `client/src/pages/admin/EmailSettings.tsx` — removed wrapper
+- **Security Fix:**
+  - Self-registration sekarang selalu registrasi sebagai EMPLOYEE (tidak bisa pilih ADMIN)
+- **QA Test:** TypeScript compilation clean, no errors
+- **Next:** Restart server & test di browser
+
+### 2026-07-09: ESS Sprint 1 - Modern Dashboard
+- **Status:** Selesai
+- **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Redesign halaman Dashboard karyawan menjadi modern ESS-style dengan greeting, profile card, attendance summary, monthly stats, quick menu, information cards
+- **Files Created (7 new):**
+  - Backend: `server/src/services/dashboard.service.ts`, `server/src/controllers/dashboard.controller.ts`, `server/src/routes/dashboard.routes.ts`
+  - Frontend: `client/src/types/index.ts`, `client/src/hooks/useGreeting.ts`, `client/src/hooks/useClock.ts`, `client/src/components/Skeleton.tsx`, `client/src/components/EmptyState.tsx`, `client/src/components/SectionHeader.tsx`
+- **Files Updated (3):**
+  - `client/src/pages/Dashboard.tsx` — complete rewrite (396 lines): greeting, profile card, attendance summary w/ progress bar, weekly chart, monthly stats, quick menu, pending leaves, upcoming holidays
+  - `server/prisma/schema.prisma` — added User fields: nik, jabatan, divisi, alamat, foto, tanggalBergabung
+  - `server/src/services/auth.service.ts` — register, login, getUserById return new fields
+  - `server/src/app.ts` — mounted `/api/dashboard` route
+- **API Endpoints:** 1 new (GET `/api/dashboard` — aggregated dashboard data)
+- **QA Test:** TypeScript compilation clean, no errors
+- **Security Test:**
+  - Dashboard API requires authMiddleware (JWT token)
+  - User只能查看自己的dashboard数据
+  - New User fields are optional (backward compatible)
+- **Next:** ESS Sprint 2 - Halaman Absensi
+
+### 2026-07-09: ESS Sprint 2 - Modern Attendance & History
+- **Status:** Selesai
+- **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Redesign halaman Absensi dan Riwayat menjadi modern ESS-style
+- **Files Created (0):** (no new files, only rewrites)
+- **Files Updated (5):**
+  - `client/src/pages/Attendance.tsx` — complete rewrite (330 lines): progress steps (GPS→Selfie→Validasi→Selesai), location info card (company name, radius, distance, within/outside status), live timer (elapsed time, countdown to target), modern selfie section with loading/success states
+  - `client/src/pages/History.tsx` — complete rewrite (350 lines): search bar, month/year/status filters, tab list/stats, statistics cards (6 statuses), weekly & monthly bar charts, Google Maps link, PDF export via print
+  - `server/src/services/attendance.service.ts` — added getCompanyLocation(), getHistoryStats() with weekly/monthly aggregation
+  - `server/src/controllers/attendance.controller.ts` — added getCompanyLocation(), getHistoryStats() handlers
+  - `server/src/routes/attendance.routes.ts` — added GET /company-location, GET /history/stats
+- **API Endpoints:** 2 new (GET `/api/attendance/company-location`, GET `/api/attendance/history/stats`)
+- **Bug Fix:** Fixed pre-existing test bug in admin.service.test.ts (getAllAttendance params)
+- **QA Test:** TypeScript compilation clean (frontend + backend), 121 tests pass
+- **Security Test:**
+  - All new endpoints require authMiddleware (JWT token)
+  - User只能查看自己的数据
+  - Company location endpoint is read-only for employees
+  - PDF export is client-side only (no sensitive data sent)
+- **Next:** ESS Sprint 3 - Halaman Riwayat
+
+### 2026-07-09: ESS Sprint 3+ - Schedule, Leave, Profile, Notification, UI Polish
+- **Status:** Selesai
+- **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Rewrite halaman Jadwal, Cuti (wizard), Profile, Notification, dan UI Polish
+- **Files Created (5):**
+  - `client/src/pages/Profile.tsx` — new page: view/edit profile, upload photo, change password
+  - `client/src/pages/Notification.tsx` — new page: notification center with categories, read/unread, mark all read
+  - `server/src/services/notification.service.ts` — notification CRUD
+  - `server/src/controllers/notification.controller.ts` — 3 handlers
+  - `server/src/routes/notification.routes.ts` — 3 routes
+- **Files Updated (12):**
+  - `client/src/pages/Schedule.tsx` — complete rewrite: monthly calendar, weekly list, holidays, shift types, modern empty state
+  - `client/src/pages/LeaveRequest.tsx` — complete rewrite: 5-step wizard (Jenis→Tanggal→Dokumen→Review→Submit), balance display
+  - `client/src/pages/LeaveHistory.tsx` — complete rewrite: balance cards, timeline approval, expandable details
+  - `client/src/components/EmployeeLayout.tsx` — SVG icons, 7 nav items (added Profile, Notification)
+  - `client/src/App.tsx` — lazy loading for all pages, new routes
+  - `client/src/contexts/AuthContext.tsx` — added alamat, foto, tanggalBergabung to User interface
+  - `server/prisma/schema.prisma` — added Notification model
+  - `server/src/services/auth.service.ts` — added updateProfile(), changePassword()
+  - `server/src/services/leave.service.ts` — added getLeaveBalance()
+  - `server/src/controllers/auth.controller.ts` — added updateProfile(), changePassword()
+  - `server/src/controllers/leave.controller.ts` — added getLeaveBalance()
+  - `server/src/app.ts` — mounted /api/notifications
+- **API Endpoints:** 6 new (PUT /auth/profile, PUT /auth/change-password, GET /leave-request/balance, GET /notifications, PUT /notifications/:id/read, PUT /notifications/read-all)
+- **QA Test:** TypeScript compilation clean (frontend + backend), 121 tests pass
+- **Security Test:**
+  - Profile update requires authMiddleware
+  - Password change validates current password
+  - Leave balance only shows own data
+  - Notifications only show own data
+  - Photo upload max 2MB validation
+- **Next:** UI Polish & Finalization
+
+### 2026-07-09: Full Integration Test
+- **Status:** Selesai
+- **Flow:** QA Test + Security Test
+- **Detail:** Full API integration testing - 19 endpoints tested, all passed
+- **Test Results (19/19 PASSED):**
+  - Employee Login, Profile, UpdateProfile, LeaveBalance, Notifications, MarkAllRead
+  - Attendance Today, CompanyLocation, HistoryStats, Schedule, Dashboard
+  - Admin Login, Dashboard, Employees, Schedules, Reports, Holidays, LeaveRequests
+  - RBAC: Employee blocked from admin (403)
+- **Unit Tests:** 121/121 pass (16 test files)
+- **TypeScript:** Clean compilation (frontend + backend)
+- **Security Test:**
+  - RBAC properly blocks employee from admin routes
+  - All endpoints require JWT authentication
+  - Password change validates current password
+  - Profile photo upload max 2MB
+- **Final Status:** Application ready for deployment
