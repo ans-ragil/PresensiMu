@@ -691,3 +691,14 @@ Agent Coding AI wajib patuhi aturan ini
 - **Detail:** Error `"adapter" property can only be provided... when "driverAdapters" preview feature is enabled` — fix dengan tambahkan `previewFeatures = ["driverAdapters"]` di generator client
 - **File Updated:** `server/prisma/schema.prisma`
 - **QA Test:** TypeScript clean, 121/121 tests pass
+
+### 2026-07-15: Railway Prisma OpenSSL & Musl Runtime Fix
+- **Status:** Selesai
+- **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Memperbaiki crash Railway akibat service memakai `server/Dockerfile` Alpine, sehingga libSQL dan Prisma memuat binary `linux-musl` yang membutuhkan `libssl.so.1.1`.
+- **Root Cause:** Railway Root Directory masih `/server`; root `Dockerfile` tidak digunakan. `server/Dockerfile` sebelumnya memakai `node:20-alpine`.
+- **Files Updated:** `Dockerfile`, `server/Dockerfile`
+- **Fix:** Kedua image menggunakan `node:20-bookworm-slim` serta memasang `openssl` dan `ca-certificates` sebelum `prisma generate`.
+- **QA Test:** Backend TypeScript clean, 121/121 tests pass, frontend production build sukses.
+- **Security Test:** `server/.env` tetap di-ignore Git; credentials tidak masuk commit.
+- **Deployment Requirement:** Untuk deploy frontend + backend dalam satu Railway service, Root Directory Railway harus dikosongkan atau `/`, bukan `/server`.

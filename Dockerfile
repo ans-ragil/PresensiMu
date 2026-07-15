@@ -1,25 +1,23 @@
-FROM node:20-slim
+FROM node:20-bookworm-slim
 
 WORKDIR /app
 
-# Copy root package.json
+# Prisma requires OpenSSL; Debian/glibc avoids libsql musl incompatibility.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends openssl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY package.json ./
 
-# Copy client
 COPY client/package*.json ./client/
 RUN cd client && npm ci
-
 COPY client/ ./client/
 RUN cd client && npm run build
 
-# Copy server - install correct platform binary
 COPY server/package*.json ./server/
-RUN cd server && npm install && \
-    npm install @libsql/linux-x64-gnu --save-optional && \
-    rm -rf node_modules/@libsql/linux-x64-musl
-
+COPY server/prisma ./server/prisma/
+RUN cd server && npm ci && npx prisma generate
 COPY server/ ./server/
-RUN cd server && npx prisma generate
 RUN cd server && npm run build
 
 EXPOSE 5000

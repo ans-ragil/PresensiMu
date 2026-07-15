@@ -1,21 +1,19 @@
-FROM node:20-alpine
+FROM node:20-bookworm-slim
 
 WORKDIR /app
 
-# Copy package files
+# Prisma requires OpenSSL; Debian/glibc also avoids libsql musl incompatibility.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends openssl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Install dependencies
 RUN npm ci
-
-# Generate Prisma Client
 RUN npx prisma generate
 
-# Copy source code
 COPY . .
-
-# Build TypeScript
 RUN npm run build
 
 EXPOSE 5000
