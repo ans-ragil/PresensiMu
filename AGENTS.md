@@ -581,3 +581,29 @@ Agent Coding AI wajib patuhi aturan ini
 - **File Updated (1):** `README.md` — complete rewrite (350+ lines)
 - **QA Test:** TypeScript compilation clean
 - **Next:** Tunggu instruksi selanjutnya
+
+### 2026-07-15: Vercel Deployment Preparation (Continued)
+- **Status:** Selesai
+- **Flow:** Investigasi → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Melanjutkan pekerjaan Vercel deployment preparation yang terputus. Semua config sudah ada, tinggal finalisasi dan .gitignore update.
+- **Changes Already Made (from previous session):**
+  - `client/src/services/api.ts` — dynamic `baseURL` via `VITE_API_URL` env var (fallback `/api` for local dev)
+  - `server/src/app.ts` — multi-origin CORS (localhost + Vercel `.vercel.app`), conditional `app.listen()` for Vercel serverless
+  - `vercel.json` — SPA rewrite rule for React Router
+  - `client/.env.example` — env vars template
+  - `client/.env.production` — Railway backend URL placeholder
+  - `client/src/vite-env.d.ts` — Vite type definitions for `VITE_API_URL`
+- **This Session:**
+  - Updated `.gitignore` — added `server/prisma/dev.db`, `server/server.err`, `.vercel/`, `client/.env.production`
+  - QA Test: TypeScript clean (frontend + backend), 121 backend tests pass, frontend production build successful (460KB gzip 151KB)
+- **QA Test:** TypeScript compilation clean, 121 backend tests pass, frontend production build successful
+- **Security Test:**
+  - `VITE_API_URL` only exposed in browser (not sensitive — it's a public API URL)
+  - `.env.production` excluded from git (contains deployed URL)
+  - CORS whitelist prevents unauthorized origins
+  - Serverless conditional listen prevents double-start on Vercel
+- **Deployment Architecture:**
+  - Frontend → Vercel (static SPA, auto-deploy from git)
+  - Backend → Railway (Node.js server, separate deploy)
+  - `.env.production` → set `VITE_API_URL` to Railway backend URL
+- **Next:** Tunggu instruksi selanjutnya (deploy atau fitur lain)

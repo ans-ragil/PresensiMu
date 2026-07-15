@@ -45,3 +45,16 @@ docker-compose.override.yml
 # Uploads
 uploads/
 *.tmp
+
+# Prisma local dev database
+server/prisma/dev.db
+server/prisma/dev.db-journal
+
+# Server logs
+server/server.err
+
+# Vercel
+.vercel/
+
+# Environment production (contains deployed URLs)
+client/.env.production
