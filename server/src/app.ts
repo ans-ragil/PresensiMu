@@ -78,6 +78,13 @@ app.use(errorHandler);
 
 // Only start server in non-Vercel environments (local dev, Docker)
 if (process.env.VERCEL !== '1') {
+  process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
+  });
+  process.on('unhandledRejection', (err) => {
+    console.error('Unhandled Rejection:', err);
+  });
+
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
