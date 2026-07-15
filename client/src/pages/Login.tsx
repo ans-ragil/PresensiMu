@@ -29,7 +29,13 @@ const Login = () => {
       const isAdminRole = ['ADMIN', 'HR', 'SUPER_ADMIN'].includes(userData.role);
       navigate(isAdminRole ? '/admin/dashboard' : '/employee/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Terjadi kesalahan saat login');
+      if (!err.response) {
+        setError('Tidak dapat terhubung ke server. Pastikan server backend berjalan.');
+      } else if (err.response.status === 429) {
+        setError('Terlalu banyak percobaan. Coba lagi dalam beberapa menit.');
+      } else {
+        setError(err.response.data?.message || 'Terjadi kesalahan saat login');
+      }
     } finally {
       setIsLoading(false);
     }

@@ -607,3 +607,22 @@ Agent Coding AI wajib patuhi aturan ini
   - Backend → Railway (Node.js server, separate deploy)
   - `.env.production` → set `VITE_API_URL` to Railway backend URL
 - **Next:** Tunggu instruksi selanjutnya (deploy atau fitur lain)
+
+### 2026-07-15: Fix Vercel 404 on Refresh & Login Error
+- **Status:** Selesai
+- **Flow:** Investigasi → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Fix 2 bug pada deployment Vercel:
+  1. **404 saat refresh** — `vercel.json` rewrite `/(.*)` menangkap `/api/*` juga, jadi request ke backend diarahkan ke `index.html`. Fix: gunakan negative lookahead `((?!api/).*)` untuk exclude `/api/*` paths.
+  2. **Login error "Terjadi Kesalahan Login"** — error handling tidak spesifik. Fix: tambah pengecekan network error (`!err.response`), rate limit (429), dan response error.
+- **Files Updated (4):**
+  - `vercel.json` — rewrite pattern exclude `/api/*`: `((?!api/).*)`
+  - `client/vercel.json` — SPA rewrite untuk Vercel deployment dari `client/` directory
+  - `client/src/pages/Login.tsx` — improved error handling: network error, rate limit, specific backend messages
+- **Root Cause 404:** Vercel SPA routing — refresh pada route seperti `/admin/dashboard` tidak dikenali sebagai file, harus di-rewrite ke `index.html`. Tapi rewrite sebelumnya `/(.*)` juga menangkap `/api/auth/login`, sehingga login request diarahkan ke SPA bukan backend.
+- **Root Cause Login:** Network error (backend tidak terjangkau) atau rate limiting — error handling sebelumnya selalu menampilkan fallback generic.
+- **QA Test:** TypeScript compilation clean (frontend + backend), 121 backend tests pass
+- **Security Test:**
+  - Rewrite pattern hanya mengecualikan `/api/*`, tidak mengubah security backend
+  - Error handling tidak membuka informasi sensitif (hanya pesan umum)
+  - Rate limit (20/5min) tetap berlaku
+- **Next:** Deploy ke Vercel + Railway, atau lanjut fitur lain
