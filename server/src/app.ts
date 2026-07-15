@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import { execSync } from 'child_process';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes';
 import attendanceRoutes from './routes/attendance.routes';
@@ -76,21 +75,6 @@ app.use('/api/settings', settingsRoutes);
 
 // Error handler
 app.use(errorHandler);
-
-// Auto-migrate database on startup (production)
-if (process.env.VERCEL !== '1') {
-  try {
-    console.log('Running database migration...');
-    execSync('npx prisma db push --accept-data-loss --schema ./prisma/schema.prisma', { 
-      stdio: 'inherit', 
-      timeout: 30000,
-      cwd: process.cwd()
-    });
-    console.log('Database migration completed.');
-  } catch (err) {
-    console.error('Database migration failed (non-fatal):', (err as Error).message);
-  }
-}
 
 // Only start server in non-Vercel environments (local dev, Docker)
 if (process.env.VERCEL !== '1') {
