@@ -2,8 +2,18 @@
   "name": "presensimu",
   "version": "1.0.0",
   "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
   "scripts": {
-    "build": "cd client && npm ci && npm run build && cd ../server && npm ci && npx prisma generate && npm run build",
-    "start": "cd server && npm start"
+    "dev:client": "npm run dev --workspace=client",
+    "dev:server": "npm run dev --workspace=server",
+    "build:client": "npm run build --workspace=client",
+    "build:server": "npm run build --workspace=server",
+    "build": "npm run build:server && npm run build:client",
+    "vercel-build": "npm run build",
+    "test": "npm test --workspace=server",
+    "start": "npm start --workspace=server"
   }
 }

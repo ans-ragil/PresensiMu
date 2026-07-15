@@ -8,12 +8,12 @@
 - [x] Tambahkan API 404 handler
 - [x] QA: TypeScript backend dan 121 unit test
 
-## Fase 2 — Monorepo Build & Routing Vercel
-- [ ] Ubah root project menjadi npm workspaces (`client`, `server`)
-- [ ] Tambahkan build scripts untuk Vercel
-- [ ] Update `vercel.json` untuk Vite static output + SPA fallback + API Function
-- [ ] Pastikan production frontend memakai same-origin `/api`
-- [ ] QA: install workspace, backend build, frontend production build
+## Fase 2 — Monorepo Build & Routing Vercel ✅
+- [x] Ubah root project menjadi npm workspaces (`client`, `server`)
+- [x] Tambahkan build scripts untuk Vercel
+- [x] Update `vercel.json` untuk Vite static output + SPA fallback + API Function
+- [x] Pastikan production frontend memakai same-origin `/api`
+- [x] QA: install workspace, backend build, frontend production build
 
 ## Fase 3 — Turso Serverless Reliability
 - [ ] Jadikan Prisma + LibSQL client singleton untuk warm invocation
