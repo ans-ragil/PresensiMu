@@ -5,6 +5,6 @@
     "buildCommand": "cd client && npm ci && npm run build && cd ../server && npm ci && npx prisma generate && npm run build"
   },
   "deploy": {
-    "startCommand": "cd server && npm start"
+    "startCommand": "npm start"
   }
 }
