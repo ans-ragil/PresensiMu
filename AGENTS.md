@@ -708,3 +708,12 @@ Agent Coding AI wajib patuhi aturan ini
 - **Detail:** Container berjalan pada port 8080 tetapi gagal menemukan `/client/dist/index.html`.
 - **Root Cause:** Railway masih memakai service Root Directory `/server`, sehingga image dibangun dari `server/Dockerfile`; folder frontend tidak masuk Docker build context. Pada deployment gabungan yang benar, static file berada di `/app/client/dist/index.html`.
 - **Required Action:** Kosongkan Root Directory Railway atau set ke `/`, gunakan root `Dockerfile`, hapus build cache, lalu redeploy commit terbaru.
+
+### 2026-07-15: Railway Production Login API URL Fix
+- **Status:** Selesai
+- **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Memperbaiki login production yang masih mengarah ke URL backend Railway lama dari `VITE_API_URL`, padahal frontend dan backend kini satu domain.
+- **Files Updated:** `client/src/services/api.ts`, `.dockerignore`
+- **Fix:** Production selalu menggunakan same-origin `/api`; environment variable `VITE_API_URL` hanya dipakai saat development. `client/.env.production` juga tidak dimasukkan Docker context.
+- **QA Test:** Frontend production build sukses; bundle tidak mengandung `presensimu-api.railway.app`; backend TypeScript clean dan 121/121 tests pass.
+- **Security Test:** Same-origin API mengurangi kebutuhan CORS lintas domain dan mencegah request login terkirim ke host backend yang salah.
