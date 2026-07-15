@@ -21,12 +21,12 @@
 - [x] Perketat CORS ke origin environment yang dikenal
 - [x] QA: TypeScript, 122 unit test, singleton, dan koneksi Turso (4 user)
 
-## Fase 4 — Distributed Rate Limiting & Migration
-- [ ] Tambahkan model rate-limit bucket di Prisma
-- [ ] Implementasikan Express rate-limit store berbasis Turso
-- [ ] Buat migration runner Turso yang versioned dan idempotent
-- [ ] Tambahkan migration awal + rate-limit
-- [ ] QA migration terhadap database lokal/cloud dan test middleware
+## Fase 4 — Distributed Rate Limiting & Migration ✅
+- [x] Tambahkan model rate-limit bucket di Prisma
+- [x] Implementasikan Express rate-limit store berbasis Turso
+- [x] Buat migration runner Turso yang versioned dan idempotent
+- [x] Tambahkan migration awal + rate-limit
+- [x] QA: 126 tests, migration cloud applied + idempotent, login sukses, bucket Turso tercatat
 
 ## Fase 5 — QA, Security, dan Dokumentasi
 - [ ] Jalankan seluruh backend tests

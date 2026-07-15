@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE "Division" (
+CREATE TABLE IF NOT EXISTS "Division" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "nama" TEXT NOT NULL,
     "description" TEXT,
@@ -9,7 +9,7 @@ CREATE TABLE "Division" (
 );
 
 -- CreateTable
-CREATE TABLE "Position" (
+CREATE TABLE IF NOT EXISTS "Position" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "nama" TEXT NOT NULL,
     "description" TEXT,
@@ -20,7 +20,7 @@ CREATE TABLE "Position" (
 );
 
 -- CreateTable
-CREATE TABLE "Shift" (
+CREATE TABLE IF NOT EXISTS "Shift" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "nama" TEXT NOT NULL,
     "jamMulai" TEXT NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE "Shift" (
 );
 
 -- CreateTable
-CREATE TABLE "User" (
+CREATE TABLE IF NOT EXISTS "User" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "nama" TEXT NOT NULL,
     "email" TEXT NOT NULL,
@@ -57,7 +57,7 @@ CREATE TABLE "User" (
 );
 
 -- CreateTable
-CREATE TABLE "Attendance" (
+CREATE TABLE IF NOT EXISTS "Attendance" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "userId" TEXT NOT NULL,
     "tanggal" DATETIME NOT NULL,
@@ -75,7 +75,7 @@ CREATE TABLE "Attendance" (
 );
 
 -- CreateTable
-CREATE TABLE "Schedule" (
+CREATE TABLE IF NOT EXISTS "Schedule" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "userId" TEXT NOT NULL,
     "hari" INTEGER NOT NULL,
@@ -89,7 +89,7 @@ CREATE TABLE "Schedule" (
 );
 
 -- CreateTable
-CREATE TABLE "LeaveRequest" (
+CREATE TABLE IF NOT EXISTS "LeaveRequest" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "userId" TEXT NOT NULL,
     "tipeIzin" TEXT NOT NULL,
@@ -107,7 +107,7 @@ CREATE TABLE "LeaveRequest" (
 );
 
 -- CreateTable
-CREATE TABLE "Holiday" (
+CREATE TABLE IF NOT EXISTS "Holiday" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "nama" TEXT NOT NULL,
     "tanggal" DATETIME NOT NULL,
@@ -116,7 +116,7 @@ CREATE TABLE "Holiday" (
 );
 
 -- CreateTable
-CREATE TABLE "CompanyLocation" (
+CREATE TABLE IF NOT EXISTS "CompanyLocation" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "nama" TEXT NOT NULL,
     "latitude" REAL NOT NULL,
@@ -127,7 +127,7 @@ CREATE TABLE "CompanyLocation" (
 );
 
 -- CreateTable
-CREATE TABLE "EmailSetting" (
+CREATE TABLE IF NOT EXISTS "EmailSetting" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "email" TEXT NOT NULL,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
@@ -136,7 +136,7 @@ CREATE TABLE "EmailSetting" (
 );
 
 -- CreateTable
-CREATE TABLE "Notification" (
+CREATE TABLE IF NOT EXISTS "Notification" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "userId" TEXT NOT NULL,
     "title" TEXT NOT NULL,
@@ -149,7 +149,7 @@ CREATE TABLE "Notification" (
 );
 
 -- CreateTable
-CREATE TABLE "CompanySetting" (
+CREATE TABLE IF NOT EXISTS "CompanySetting" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "key" TEXT NOT NULL,
     "value" TEXT NOT NULL,
@@ -159,29 +159,29 @@ CREATE TABLE "CompanySetting" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Division_nama_key" ON "Division"("nama");
+CREATE UNIQUE INDEX IF NOT EXISTS "Division_nama_key" ON "Division"("nama");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Position_nama_key" ON "Position"("nama");
+CREATE UNIQUE INDEX IF NOT EXISTS "Position_nama_key" ON "Position"("nama");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Shift_nama_key" ON "Shift"("nama");
+CREATE UNIQUE INDEX IF NOT EXISTS "Shift_nama_key" ON "Shift"("nama");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+CREATE UNIQUE INDEX IF NOT EXISTS "User_email_key" ON "User"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Attendance_userId_tanggal_key" ON "Attendance"("userId", "tanggal");
+CREATE UNIQUE INDEX IF NOT EXISTS "Attendance_userId_tanggal_key" ON "Attendance"("userId", "tanggal");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Schedule_userId_hari_key" ON "Schedule"("userId", "hari");
+CREATE UNIQUE INDEX IF NOT EXISTS "Schedule_userId_hari_key" ON "Schedule"("userId", "hari");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "EmailSetting_email_key" ON "EmailSetting"("email");
+CREATE UNIQUE INDEX IF NOT EXISTS "EmailSetting_email_key" ON "EmailSetting"("email");
 
 -- CreateIndex
-CREATE INDEX "Notification_userId_isRead_idx" ON "Notification"("userId", "isRead");
+CREATE INDEX IF NOT EXISTS "Notification_userId_isRead_idx" ON "Notification"("userId", "isRead");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "CompanySetting_key_key" ON "CompanySetting"("key");
+CREATE UNIQUE INDEX IF NOT EXISTS "CompanySetting_key_key" ON "CompanySetting"("key");
 

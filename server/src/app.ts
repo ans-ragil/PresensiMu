@@ -14,6 +14,7 @@ import employeeRoutes from './routes/employee.routes';
 import settingsRoutes from './routes/settings.routes';
 import { authMiddleware } from './middleware/auth';
 import { errorHandler } from './middleware/errorHandler';
+import { TursoRateLimitStore } from './middleware/tursoRateLimitStore';
 
 dotenv.config();
 
@@ -65,7 +66,9 @@ const authLimiter = rateLimit({
   max: 20,
   message: { success: false, message: 'Terlalu banyak percobaan' },
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
+  store: new TursoRateLimitStore('auth:'),
+  passOnStoreError: false
 });
 
 // Routes

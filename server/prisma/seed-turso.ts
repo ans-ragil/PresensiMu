@@ -1,4 +1,4 @@
-import { createClient } from '@libsql/client';
+import { createClient } from '@libsql/client/http';
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 import { resolve } from 'path';

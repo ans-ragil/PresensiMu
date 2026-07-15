@@ -13,7 +13,9 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
+    "db:migrate:turso": "tsx prisma/migrate-turso.ts",
     "db:seed": "tsx prisma/seed.ts",
+    "db:seed:turso": "tsx prisma/seed-turso.ts",
     "db:studio": "prisma studio"
   },
   "dependencies": {
