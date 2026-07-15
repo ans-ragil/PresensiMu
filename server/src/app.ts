@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
+import path from 'path';
 import prisma from './config/database';
 import authRoutes from './routes/auth.routes';
 import attendanceRoutes from './routes/attendance.routes';
@@ -39,9 +40,12 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin, callback) => {
+    // Allow same-origin requests (no origin header)
     if (!origin) return callback(null, true);
+    // Allow whitelisted origins
     if (allowedOrigins.includes(origin)) return callback(null, true);
-    if (origin.endsWith('.vercel.app')) return callback(null, true);
+    // Allow Railway and Vercel domains
+    if (origin.endsWith('.railway.app') || origin.endsWith('.vercel.app')) return callback(null, true);
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true
@@ -67,6 +71,16 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/employees', employeeRoutes);
 app.use('/api/settings', settingsRoutes);
+
+// Serve frontend static files (production)
+const clientDistPath = path.join(__dirname, '../../client/dist');
+app.use(express.static(clientDistPath));
+
+// SPA fallback — semua non-API route serve index.html
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api')) return next();
+  res.sendFile(path.join(clientDistPath, 'index.html'));
+});
 
 // Error handler
 app.use(errorHandler);

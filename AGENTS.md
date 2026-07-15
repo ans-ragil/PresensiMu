@@ -651,3 +651,43 @@ Agent Coding AI wajib patuhi aturan ini
   5. Set `VITE_API_URL` in Vercel environment variables = `https://presensimu-production.up.railway.app/api`
   6. Redeploy both Vercel and Railway
 - **Next:** Jalankan deployment steps, test login
+
+### 2026-07-15: Database Migration - PostgreSQL → Turso (LibSQL/SQLite)
+- **Status:** Selesai
+- **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Migrasi database dari PostgreSQL ke Turso (LibSQL/SQLite) untuk deployment lebih mudah dan murah
+- **Files Updated (6):**
+  - `server/prisma/schema.prisma` — provider `postgresql` → `sqlite`
+  - `server/src/config/database.ts` — gunakan Turso adapter (`@libsql/client` + `@prisma/adapter-libsql`)
+  - `server/package.json` — tambah dependency `@libsql/client@^0.8.0` + `@prisma/adapter-libsql@^5.22.0`
+  - `.env.example` — update format URL Turso
+  - `server/.env.example` — update format URL Turso
+  - `server/.env` — buat baru dengan local SQLite (`file:./prisma/dev.db`)
+  - `docker-compose.yml` — hapus PostgreSQL service, update env vars ke Turso
+  - `server/prisma/schema.prisma` — tambah `previewFeatures = ["driverAdapters"]` (fix adapter error)
+- **Files Deleted:**
+  - `server/prisma/migrations/` — hapus migration PostgreSQL lama (tidak kompatibel SQLite)
+- **Database Created:** SQLite `dev.db` dengan 13 tabel (schema push)
+- **Seed Data:** 4 akun (Super Admin, HR, Admin, Employee) + company location + 20 holidays
+- **QA Test:** TypeScript compilation clean (frontend + backend), 121/121 backend tests pass
+- **Security Test:**
+  - Turso auth token via env var (tidak hardcoded)
+  - Local dev menggunakan file-based SQLite (tidak perlu auth token)
+  - `.gitignore` sudah exclude `dev.db` dan `dev.db-journal`
+- **Catatan Teknis:**
+  - `@libsql/client` harus versi `^0.8.0` (bukan `^0.14.0`) karena peer dependency `@prisma/adapter-libsql`
+  - PrismaClient `adapter` option perlu `as any` cast karena type definitions Prisma v5 belum lengkap
+  - Tidak ada raw SQL atau PostgreSQL-specific query di codebase → migrasi bersih
+  - `contains` filter di Prisma untuk field `String` tetap works di SQLite
+- **Deployment (Turso Cloud):**
+  1. Buat database di turso.io
+  2. Set `TURSO_DATABASE_URL=libsql://your-db.turso.io` dan `TURSO_AUTH_TOKEN` di environment
+  3. Jalankan `npx prisma db push` untuk buat tabel
+  4. Jalankan `npx tsx prisma/seed.ts` untuk seed data
+- **Next:** Tunggu instruksi selanjutnya
+
+### 2026-07-15: Fix Prisma Driver Adapter Error
+- **Status:** Selesai
+- **Detail:** Error `"adapter" property can only be provided... when "driverAdapters" preview feature is enabled` — fix dengan tambahkan `previewFeatures = ["driverAdapters"]` di generator client
+- **File Updated:** `server/prisma/schema.prisma`
+- **QA Test:** TypeScript clean, 121/121 tests pass

@@ -1,4 +1,37 @@
 -- CreateTable
+CREATE TABLE "Division" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "nama" TEXT NOT NULL,
+    "description" TEXT,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "Position" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "nama" TEXT NOT NULL,
+    "description" TEXT,
+    "level" INTEGER NOT NULL DEFAULT 0,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "Shift" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "nama" TEXT NOT NULL,
+    "jamMulai" TEXT NOT NULL,
+    "jamSelesai" TEXT NOT NULL,
+    "toleransiMenit" INTEGER NOT NULL DEFAULT 30,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL
+);
+
+-- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "nama" TEXT NOT NULL,
@@ -6,8 +39,21 @@ CREATE TABLE "User" (
     "password" TEXT NOT NULL,
     "role" TEXT NOT NULL DEFAULT 'EMPLOYEE',
     "noTelp" TEXT,
+    "nik" TEXT,
+    "jabatan" TEXT,
+    "divisi" TEXT,
+    "alamat" TEXT,
+    "foto" TEXT,
+    "tanggalBergabung" DATETIME,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "divisiId" TEXT,
+    "jabatanId" TEXT,
+    "shiftId" TEXT,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "User_divisiId_fkey" FOREIGN KEY ("divisiId") REFERENCES "Division" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "User_jabatanId_fkey" FOREIGN KEY ("jabatanId") REFERENCES "Position" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "User_shiftId_fkey" FOREIGN KEY ("shiftId") REFERENCES "Shift" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -89,6 +135,38 @@ CREATE TABLE "EmailSetting" (
     "updatedAt" DATETIME NOT NULL
 );
 
+-- CreateTable
+CREATE TABLE "Notification" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "message" TEXT NOT NULL,
+    "category" TEXT NOT NULL DEFAULT 'SISTEM',
+    "isRead" BOOLEAN NOT NULL DEFAULT false,
+    "link" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "Notification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "CompanySetting" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "key" TEXT NOT NULL,
+    "value" TEXT NOT NULL,
+    "description" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Division_nama_key" ON "Division"("nama");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Position_nama_key" ON "Position"("nama");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Shift_nama_key" ON "Shift"("nama");
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
@@ -100,3 +178,10 @@ CREATE UNIQUE INDEX "Schedule_userId_hari_key" ON "Schedule"("userId", "hari");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "EmailSetting_email_key" ON "EmailSetting"("email");
+
+-- CreateIndex
+CREATE INDEX "Notification_userId_isRead_idx" ON "Notification"("userId", "isRead");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "CompanySetting_key_key" ON "CompanySetting"("key");
+

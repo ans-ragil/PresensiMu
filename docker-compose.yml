@@ -1,40 +1,22 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:16-alpine
-    container_name: absensi-postgres
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-absensi_secret_2024}
-      POSTGRES_DB: absensi_db
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - app-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-
   server:
     build:
       context: ./server
       dockerfile: Dockerfile
     container_name: absensi-server
     environment:
-      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-absensi_secret_2024}@postgres:5432/absensi_db
+      TURSO_DATABASE_URL: ${TURSO_DATABASE_URL:-file:./prisma/dev.db}
+      TURSO_AUTH_TOKEN: ${TURSO_AUTH_TOKEN:-}
       JWT_SECRET: ${JWT_SECRET:-absensi-jwt-secret-2024-change-this}
       JWT_EXPIRES_IN: 30m
       REFRESH_TOKEN_EXPIRES_IN: 7d
       PORT: 5000
       NODE_ENV: production
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost}
-    depends_on:
-      postgres:
-        condition: service_healthy
+    volumes:
+      - db_data:/app/server/prisma
     networks:
       - app-network
     restart: unless-stopped
@@ -65,7 +47,7 @@ services:
     restart: unless-stopped
 
 volumes:
-  postgres_data:
+  db_data:
 
 networks:
   app-network:
