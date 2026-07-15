@@ -1,6 +1,7 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import api from '../services/api';
 import {
   AppBar,
   Box,
@@ -19,6 +20,8 @@ import {
   Divider,
   Tooltip,
   Badge,
+  Popover,
+  Button,
   useTheme,
   useMediaQuery,
 } from '@mui/material';
@@ -40,6 +43,8 @@ import {
   Map as MapIcon,
   LocationOn as LocationIcon,
   Email as EmailIcon,
+  Tune as TuneIcon,
+  CheckCircle as CheckIcon,
 } from '@mui/icons-material';
 
 const DRAWER_WIDTH = 260;
@@ -47,16 +52,28 @@ const COLLAPSED_WIDTH = 68;
 
 const menuItems = [
   { path: '/admin/dashboard', label: 'Dashboard', icon: <DashboardIcon /> },
+  { divider: true, label: 'HR Module' },
+  { path: '/admin/hr/schedule', label: 'Jadwal Kerja', icon: <CalendarIcon /> },
+  { path: '/admin/hr/attendance', label: 'Monitoring Absensi', icon: <AttendanceIcon /> },
+  { path: '/admin/hr/leave', label: 'Persetujuan Cuti', icon: <LeaveIcon /> },
+  { path: '/admin/hr/reports', label: 'Laporan', icon: <ReportIcon /> },
+  { path: '/admin/hr/settings', label: 'Pengaturan', icon: <TuneIcon /> },
+  { divider: true, label: 'Management' },
   { path: '/admin/employees', label: 'Manajemen Karyawan', icon: <PeopleIcon /> },
-  { path: '/admin/attendance', label: 'Absensi', icon: <AttendanceIcon /> },
-  { path: '/admin/schedule', label: 'Jadwal Kerja', icon: <CalendarIcon /> },
-  { path: '/admin/leave-management', label: 'Persetujuan Cuti', icon: <LeaveIcon /> },
-  { path: '/admin/reports', label: 'Laporan', icon: <ReportIcon /> },
-  { divider: true },
   { path: '/admin/live-tracking', label: 'Live Tracking', icon: <MapIcon /> },
   { path: '/admin/company-location', label: 'Lokasi Kantor', icon: <LocationIcon /> },
   { path: '/admin/email-settings', label: 'Pengaturan Email', icon: <EmailIcon /> },
 ];
+
+interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  category: string;
+  isRead: boolean;
+  link: string | null;
+  createdAt: string;
+}
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -72,8 +89,44 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notifAnchor, setNotifAnchor] = useState<null | HTMLElement>(null);
 
   const drawerWidth = collapsed ? COLLAPSED_WIDTH : DRAWER_WIDTH;
+
+  const fetchNotifications = useCallback(async () => {
+    try {
+      const res = await api.get('/notifications');
+      setNotifications(res.data.data.notifications || []);
+      setUnreadCount(res.data.data.unreadCount || 0);
+    } catch {
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(interval);
+  }, [fetchNotifications]);
+
+  const handleMarkAsRead = async (id: string) => {
+    try {
+      await api.put(`/notifications/${id}/read`);
+      setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)));
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+    } catch {
+    }
+  };
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      await api.put('/notifications/read-all');
+      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+      setUnreadCount(0);
+    } catch {
+    }
+  };
 
   const handleDrawerToggle = () => {
     if (isMobile) {
@@ -268,11 +321,89 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {/* Notifications */}
-            <IconButton size="small" sx={{ color: 'text.secondary' }}>
-              <Badge badgeContent={0} color="error">
+            <IconButton
+              size="small"
+              sx={{ color: 'text.secondary' }}
+              onClick={(e) => setNotifAnchor(e.currentTarget)}
+            >
+              <Badge badgeContent={unreadCount} color="error" max={99}>
                 <NotificationIcon fontSize="small" />
               </Badge>
             </IconButton>
+
+            {/* Notification Popover */}
+            <Popover
+              open={Boolean(notifAnchor)}
+              anchorEl={notifAnchor}
+              onClose={() => setNotifAnchor(null)}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+              slotProps={{
+                paper: {
+                  sx: { width: 360, maxHeight: 480, mt: 1, borderRadius: '12px', overflow: 'hidden' },
+                },
+              }}
+            >
+              <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="h6" sx={{ fontWeight: 700, fontSize: '1rem' }}>Notifikasi</Typography>
+                {unreadCount > 0 && (
+                  <Button size="small" startIcon={<CheckIcon />} onClick={handleMarkAllAsRead}>
+                    Tandai semua dibaca
+                  </Button>
+                )}
+              </Box>
+              <Box sx={{ overflow: 'auto', maxHeight: 400 }}>
+                {notifications.length === 0 ? (
+                  <Box sx={{ py: 6, textAlign: 'center', color: '#94a3b8' }}>
+                    <NotificationIcon sx={{ fontSize: 40, mb: 1, opacity: 0.5 }} />
+                    <Typography variant="body2">Tidak ada notifikasi</Typography>
+                  </Box>
+                ) : (
+                  notifications.slice(0, 20).map((n) => (
+                    <Box
+                      key={n.id}
+                      onClick={() => {
+                        if (!n.isRead) handleMarkAsRead(n.id);
+                        if (n.link) navigate(n.link);
+                        setNotifAnchor(null);
+                      }}
+                      sx={{
+                        px: 2,
+                        py: 1.5,
+                        cursor: 'pointer',
+                        borderBottom: '1px solid #f1f5f9',
+                        bgcolor: n.isRead ? 'transparent' : '#f8f8ff',
+                        '&:hover': { bgcolor: '#f1f5f9' },
+                        display: 'flex',
+                        gap: 1.5,
+                      }}
+                    >
+                      <Box sx={{ mt: 0.5 }}>
+                        <Box
+                          sx={{
+                            width: 8,
+                            height: 8,
+                            borderRadius: '50%',
+                            bgcolor: n.isRead ? '#cbd5e1' : '#6366f1',
+                          }}
+                        />
+                      </Box>
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Typography variant="body2" sx={{ fontWeight: n.isRead ? 400 : 600, fontSize: '0.813rem' }}>
+                          {n.title}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: '#64748b', display: 'block', mt: 0.25 }}>
+                          {n.message}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: '#94a3b8', mt: 0.5, display: 'block' }}>
+                          {new Date(n.createdAt).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  ))
+                )}
+              </Box>
+            </Popover>
 
             {/* Profile */}
             <Box
@@ -336,11 +467,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 />
               </MenuItem>
               <Divider />
-              <MenuItem onClick={handleProfileMenuClose}>
+              <MenuItem onClick={() => { handleProfileMenuClose(); navigate('/admin/hr/settings'); }}>
                 <ListItemIcon><PersonIcon fontSize="small" /></ListItemIcon>
                 <ListItemText primary="Profile" />
               </MenuItem>
-              <MenuItem onClick={handleProfileMenuClose}>
+              <MenuItem onClick={() => { handleProfileMenuClose(); navigate('/admin/hr/settings'); }}>
                 <ListItemIcon><SettingsIcon fontSize="small" /></ListItemIcon>
                 <ListItemText primary="Pengaturan" />
               </MenuItem>

@@ -1,4 +1,5 @@
 import prisma from '../config/database';
+import { notificationService } from './notification.service';
 
 interface CreateLeaveInput {
   userId: string;
@@ -66,6 +67,30 @@ export class LeaveService {
         }
       }
     });
+
+    // Notify all admins/HR about new leave request
+    const admins = await prisma.user.findMany({
+      where: { role: { in: ['ADMIN', 'HR', 'SUPER_ADMIN'] }, isActive: true },
+      select: { id: true }
+    });
+    const leaveTypeLabels: Record<string, string> = {
+      CUTI_TAHUNAN: 'Cuti Tahunan',
+      IZIN_SAKIT: 'Izin Sakit',
+      IZIN_PRIBADI: 'Izin Pribadi',
+      LIBUR_LOKAL: 'Libur Lokal',
+    };
+    const tipeLabel = leaveTypeLabels[tipeIzin] || tipeIzin;
+    const tanggal = startDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    for (const admin of admins) {
+      await notificationService.createNotification(
+        admin.id,
+        'Pengajuan Cuti Baru',
+        `${leaveRequest.user.nama} mengajukan ${tipeLabel} pada ${tanggal}. Menunggu persetujuan Anda.`,
+        'APPROVAL',
+        '/admin/hr/leave'
+      );
+    }
 
     return leaveRequest;
   }
@@ -146,6 +171,24 @@ export class LeaveService {
       }
     });
 
+    // Create notification for employee
+    const leaveTypeLabels: Record<string, string> = {
+      CUTI_TAHUNAN: 'Cuti Tahunan',
+      IZIN_SAKIT: 'Izin Sakit',
+      IZIN_PRIBADI: 'Izin Pribadi',
+      LIBUR_LOKAL: 'Libur Lokal',
+    };
+    const tipeLabel = leaveTypeLabels[leaveRequest.tipeIzin] || leaveRequest.tipeIzin;
+    const tanggal = new Date(leaveRequest.tanggalMulai).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    await notificationService.createNotification(
+      leaveRequest.userId,
+      'Pengajuan Cuti Disetujui',
+      `Pengajuan ${tipeLabel} Anda pada ${ tanggal} telah disetujui.${catatanAdmin ? ` Catatan: ${catatanAdmin}` : ''}`,
+      'APPROVAL',
+      '/employee/leave-history'
+    );
+
     return updated;
   }
 
@@ -183,6 +226,24 @@ export class LeaveService {
         }
       }
     });
+
+    // Create notification for employee
+    const leaveTypeLabels: Record<string, string> = {
+      CUTI_TAHUNAN: 'Cuti Tahunan',
+      IZIN_SAKIT: 'Izin Sakit',
+      IZIN_PRIBADI: 'Izin Pribadi',
+      LIBUR_LOKAL: 'Libur Lokal',
+    };
+    const tipeLabel = leaveTypeLabels[leaveRequest.tipeIzin] || leaveRequest.tipeIzin;
+    const tanggal = new Date(leaveRequest.tanggalMulai).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    await notificationService.createNotification(
+      leaveRequest.userId,
+      'Pengajuan Cuti Ditolak',
+      `Pengajuan ${tipeLabel} Anda pada ${ tanggal} telah ditolak.${catatanAdmin ? ` Alasan: ${catatanAdmin}` : ''}`,
+      'APPROVAL',
+      '/employee/leave-history'
+    );
 
     return updated;
   }

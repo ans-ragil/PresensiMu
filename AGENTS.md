@@ -314,3 +314,245 @@ Agent Coding AI wajib patuhi aturan ini
   | `server/src/routes/admin.routes.ts` | Allow HR/SUPER_ADMIN access |
   | `server/prisma/seed.ts` | Add Super Admin + HR seed accounts |
 - **Next:** Admin Dashboard content implementation
+
+### 2026-07-13: Backend API - Employee Management CRUD
+- **Status:** Selesai
+- **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Backend API untuk manajemen karyawan: CRUD, filter, search, pagination, plus Division/Position/Shift management
+- **Files Created (3 new):**
+  - `server/src/services/employee.service.ts` — EmployeeService class: CRUD karyawan + Division/Position/Shift CRUD + filter/search/pagination + soft delete + restore + change password
+  - `server/src/controllers/employee.controller.ts` — EmployeeController: 18 handler methods for all employee/division/position/shift operations
+  - `server/src/routes/employee.routes.ts` — 20 API endpoints under /api/employees with RBAC
+- **Files Updated (2):**
+  - `server/src/app.ts` — mounted /api/employees route
+  - `server/src/middleware/errorHandler.ts` — added error handlers for Karyawan/Divisi/Jabatan/Shift not found + duplicate name errors
+- **API Endpoints (20 new):**
+  - Employee: GET / (list+filter), GET /:id, POST /, PUT /:id, DELETE /:id, PUT /:id/restore, PUT /:id/change-password
+  - Division: GET /divisions/list, POST /divisions, PUT /divisions/:id, DELETE /divisions/:id
+  - Position: GET /positions/list, POST /positions, PUT /positions/:id, DELETE /positions/:id
+  - Shift: GET /shifts/list, POST /shifts, PUT /shifts/:id, DELETE /shifts/:id
+- **QA Test:** TypeScript compilation clean, 121 backend tests pass (no regressions)
+- **Security Test:**
+  - All endpoints require authMiddleware (JWT) + adminOnly (ADMIN/HR/SUPER_ADMIN)
+  - Employee cannot access employee management routes (403)
+  - Email uniqueness validation on create/update
+  - FK reference validation (divisiId, jabatanId, shiftId checked against DB)
+  - Soft delete pattern (isActive=false) preserves data integrity
+- **Next:** Frontend Employee Management pages
+
+### 2026-07-13: HR Module Frontend - 5 Modul Material UI
+- **Status:** Selesai
+- **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Implementasi 5 modul HR frontend dengan Material UI: Jadwal Kerja, Monitoring Absensi, Persetujuan Cuti, Laporan, Pengaturan
+- **Files Created (11 new):**
+  - `client/src/theme/adminTheme.ts` — MUI theme dengan primary #6366f1, custom card/button/chip/table styles
+  - `client/src/components/hr/HrPageContainer.tsx` — Shared page layout dengan title, subtitle, breadcrumbs, actions
+  - `client/src/components/hr/HrSkeleton.tsx` — Skeleton loading: TableSkeleton, CardSkeleton, CalendarSkeleton, FormSkeleton
+  - `client/src/components/hr/HrEmptyState.tsx` — Empty state component dengan icon, title, description, action
+  - `client/src/services/hrApi.ts` — API service layer: employeeApi, divisionApi, positionApi, shiftApi, scheduleApi, holidayApi, attendanceApi, leaveApi, reportApi, locationApi, dashboardApi
+  - `client/src/pages/admin/HrSchedule.tsx` — Calendar View dengan CRUD jadwal, bulk assign, holiday management (655 lines)
+  - `client/src/pages/admin/HrAttendance.tsx` — Tabel monitoring absensi dengan filter (date/status/divisi/shift), detail modal selfie/maps/duration (488 lines)
+  - `client/src/pages/admin/HrLeaveApproval.tsx` — Approval workflow dengan tab (Menunggu/Disetujui/Ditolak/Semua), approve/reject dengan catatan (413 lines)
+  - `client/src/pages/admin/HrReports.tsx` — 5 tipe laporan (harian/mingguan/bulanan/per karyawan/cuti), export PDF/Excel/CSV (342 lines)
+  - `client/src/pages/admin/HrSettings.tsx` — Company profile, lokasi (Google Maps embed), jam kerja, SMTP, logo upload, holiday management (489 lines)
+- **Files Updated (4):**
+  - `client/src/types/index.ts` — Added UserRole type, Division, Position, Shift, LeaveRequest, CompanyLocation, Pagination, EmployeeFilter, DailyReport interfaces
+  - `client/src/components/AdminLayout.tsx` — Updated navigation menu: HR Module section (5 items) + Management section + Settings section
+  - `client/src/App.tsx` — Added 5 HR module routes under /admin/hr/*, lazy imports for all new pages
+- **Modules Implemented:**
+  1. **Jadwal Kerja** — Calendar View bulanan, CRUD jadwal per hari, bulk assign karyawan, kelola hari libur
+  2. **Monitoring Absensi** — Tabel dengan filter (tanggal/cari/status/divisi/shift), summary cards, detail modal (selfie, Google Maps, durasi)
+  3. **Persetujuan Cuti** — Tab-based workflow, approve/reject dengan catatan, badge notification pending
+  4. **Laporan** — 5 tipe laporan, filter dinamis, export ke PDF/Excel/CSV
+  5. **Pengaturan** — 6 tab (Profil/Lokasi/Jam Kerja/SMTP/Logo/Hari Libur), Google Maps embed, GPS detection
+- **Tech Stack:** Material UI v9, React Router, Axios, TypeScript
+- **QA Test:** TypeScript compilation clean (frontend + backend), 121 backend tests pass (no regressions)
+- **Security Test:**
+  - All HR module routes require ADMIN_ROLES authentication
+  - Employee portal unchanged (tidak ada perubahan)
+  - RBAC maintained: ADMIN/HR/SUPER_ADMIN only
+- **Employee Portal Status:** TIDAK BERUBAH - semua halaman employee tetap berfungsi normal
+- **Next:** Employee Portal verification, update README.md, update SPRINT.md
+
+### 2026-07-13: Backend HR Module - Settings API + Enhanced Attendance
+- **Status:** Selesai
+- **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Backend API untuk Company Settings (profil, jam kerja, SMTP, logo) + enhanced attendance filter
+- **Files Created (3 new):**
+  - `server/src/services/settings.service.ts` — SettingsService: getAll, get/set company profile, work time, SMTP, logo dengan key-value pattern
+  - `server/src/controllers/settings.controller.ts` — SettingsController: 9 handler methods untuk semua settings endpoints
+  - `server/src/routes/settings.routes.ts` — 9 API endpoints under /api/settings dengan RBAC
+- **Files Updated (4):**
+  - `server/prisma/schema.prisma` — added CompanySetting model (key-value pattern)
+  - `server/src/app.ts` — mounted /api/settings route
+  - `server/src/services/admin.service.ts` — enhanced getAllAttendance with filter (divisiId, shiftId, status) + more user fields
+  - `server/src/controllers/admin.controller.ts` — updated getAllAttendance to pass new filter params
+  - `server/src/services/admin.service.test.ts` — fixed test for new getAllAttendance signature
+  - `client/src/services/hrApi.ts` — added settingsApi (company profile, work time, SMTP, logo)
+  - `client/src/pages/admin/HrSettings.tsx` — updated to use settingsApi for all save operations
+- **API Endpoints (9 new):**
+  - Company Profile: GET /settings/company-profile, PUT /settings/company-profile
+  - Work Time: GET /settings/work-time, PUT /settings/work-time
+  - SMTP: GET /settings/smtp, PUT /settings/smtp
+  - Logo: GET /settings/logo, PUT /settings/logo
+  - All Settings: GET /settings
+- **Enhanced Endpoints:**
+  - GET /admin/attendance — now supports filter: ?divisiId=&shiftId=&status= (before only ?startDate=&endDate=)
+- **QA Test:** TypeScript compilation clean (frontend + backend), 121 backend tests pass (no regressions)
+- **Security Test:**
+  - All settings endpoints require authMiddleware + adminOnly (ADMIN/HR/SUPER_ADMIN)
+  - Employee cannot access settings routes (403)
+  - Logo upload validates base64 size (max 2MB)
+  - Settings stored as key-value in CompanySetting table
+- **Employee Portal Status:** TIDAK BERUBAH
+- **Next:** Integration testing seluruh modul HR
+
+### 2026-07-13: Progress Logging - Login Error & Notification Fix
+- **Status:** Dikerjakan
+- **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Mencatat progres terkait perbaikan error login yang sebelumnya tampil generic `terjadi kesalahan` serta pengecekan alur notifikasi setelah perubahan autentikasi dan role-based access.
+- **Scope:**
+  - Backend auth: validasi credential login secara eksplisit
+  - Error handling: mempertahankan `statusCode` dari auth error agar frontend tidak hanya menerima pesan generic
+  - Notification flow: memastikan endpoint notifikasi tetap aman dan sesuai user yang sedang login
+- **Files Targeted:** `server/src/services/auth.service.ts`, `server/src/middleware/errorHandler.ts`, `server/src/controllers/notification.controller.ts`
+- **QA Test:** Menunggu verifikasi ulang login dan response notifikasi setelah patch
+- **Security Test:** Pastikan auth failure tidak membuka user enumeration, serta role-based access untuk notifikasi tetap berlaku
+- **Next:** Jalankan uji login ulang, cek pesan error spesifik, lalu validasi endpoint notifikasi untuk user HR/Admin/Employee
+
+### 2026-07-13: User Clarification - Backend Login Fix Need
+- **Status:** Selesai
+- **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** User menanyakan apakah perlu mengirim prompt terminal atau bug sudah selesai.
+- **Kesimpulan:** Masalah login backend belum selesai; perlu patch auth service dan error handler sebelum menjalankan terminal seed/migrate.
+- **Next:** Terapkan patch 401 untuk credential invalid, lalu jalankan migrate/seed di terminal.
+
+### 2026-07-13: User Guidance - Admin/HR Testing Access
+- **Status:** Selesai
+- **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** User menanyakan cara testing sistem sebagai admin/HR.
+- **Decision:** Untuk testing role HR/Admin, gunakan akun seed yang tersedia di sistem. Register biasa hanya menghasilkan EMPLOYEE. Akun seed yang tersedia:
+  - HR: `hr@presensimu.com` / `hr123`
+  - ADMIN: `admin@presensimu.com` / `admin123`
+  - SUPER_ADMIN: `superadmin@presensimu.com` / `superadmin123`
+- **Outcome:** User tidak perlu membuat akun HR melalui form register untuk testing role admin/HR.
+
+### 2026-07-15: UI Enhancement - Login & Register Page Redesign
+- **Status:** Selesai
+- **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Redesign halaman Login dan Register agar lebih profesional dan modern
+- **Files Updated (2):**
+  - `client/src/pages/Login.tsx` — complete rewrite: split-panel layout (branding left, form right), email icon, password icon, **show/hide password toggle** (eye icon), "Ingat saya" checkbox, "Lupa password" link, gradient background with decorative blurs, feature highlights, modern card styling with rounded-xl
+  - `client/src/pages/Register.tsx` — complete rewrite: same split-panel layout, person/email/phone/lock icons on all inputs, **show/hide password toggle** on both password fields, terms & conditions link, feature checklist on branding panel, modern card styling
+- **Features Added:**
+  - Eye icon (Visibility/VisibilityOff) untuk toggle show/hide password di Login & Register
+  - MUI icons di setiap input field (EmailOutlined, LockOutlined, PersonOutlined, PhoneOutlined)
+  - Split-panel layout: branding panel di kiri (gradient blue), form di kanan
+  - Responsive: branding panel hanya tampil di desktop (lg breakpoint)
+  - Mobile: logo centered di atas form
+  - Decorative gradient blur effects di branding panel
+  - "Ingat saya" checkbox & "Lupa password" link di Login
+  - Terms & conditions text di Register
+  - Feature highlights di branding panel (Login: Real-time/GPS/Laporan; Register: fitur checklist)
+  - Footer copyright
+  - Shadow & hover effects pada tombol submit
+- **Tech Stack:** MUI Icons (@mui/icons-material) + Tailwind CSS
+- **QA Test:** TypeScript compilation clean, 121 backend tests pass (no regressions)
+- **Security Test:**
+  - Password仍然hidden by default (type="password")
+  - Toggle hanya frontend only (tidak mengubah security backend)
+  - Form validation tetap berfungsi (required fields, email format, password min 6 chars)
+  - Register tetap hanya menghasilkan EMPLOYEE role (security fix preserved)
+- **Employee Portal Status:** TIDAK BERUBAH - semua halaman employee tetap berfungsi normal
+- **Next:** UI Enhancement modul lain jika diperlukan
+
+### 2026-07-15: Branding Rename - PresensiKu → PresensiMu
+- **Status:** Selesai
+- **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Mengubah nama sistem dari "PresensiKu" menjadi "PresensiMu" di seluruh aplikasi
+- **Files Updated (3):**
+  - `client/src/pages/Login.tsx` — PresensiKu → PresensiMu (branding title + footer copyright)
+  - `client/src/pages/Register.tsx` — PresensiKu → PresensiMu (branding title + footer copyright)
+  - `client/src/components/EmployeeLayout.tsx` — Header navbar "Absensi" → "PresensiMu"
+- **QA Test:** TypeScript compilation clean
+- **Security Test:** No security impact (branding change only)
+- **Next:** Tunggu instruksi selanjutnya
+
+### 2026-07-15: UI Enhancement - Login & Register Page Redesign
+- **Status:** Selesai
+- **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Redesign halaman Login dan Register agar lebih profesional dan modern
+- **Files Updated (2):**
+  - `client/src/pages/Login.tsx` — complete rewrite: split-panel layout (branding left, form right), email icon, password icon, **show/hide password toggle** (eye icon), "Ingat saya" checkbox, "Lupa password" link, gradient background with decorative blurs, feature highlights, modern card styling with rounded-xl
+  - `client/src/pages/Register.tsx` — complete rewrite: same split-panel layout, person/email/phone/lock icons on all inputs, **show/hide password toggle** on both password fields, terms & conditions link, feature checklist on branding panel, modern card styling
+- **Features Added:**
+  - Eye icon (Visibility/VisibilityOff) untuk toggle show/hide password di Login & Register
+  - MUI icons di setiap input field (EmailOutlined, LockOutlined, PersonOutlined, PhoneOutlined)
+  - Split-panel layout: branding panel di kiri (gradient blue), form di kanan
+  - Responsive: branding panel hanya tampil di desktop (lg breakpoint)
+  - Mobile: logo centered di atas form
+  - Decorative gradient blur effects di branding panel
+  - "Ingat saya" checkbox & "Lupa password" link di Login
+  - Terms & conditions text di Register
+  - Feature highlights di branding panel (Login: Real-time/GPS/Laporan; Register: fitur checklist)
+  - Footer copyright
+  - Shadow & hover effects pada tombol submit
+- **Tech Stack:** MUI Icons (@mui/icons-material) + Tailwind CSS
+- **QA Test:** TypeScript compilation clean, 121 backend tests pass (no regressions)
+- **Security Test:**
+  - Password仍然hidden by default (type="password")
+  - Toggle hanya frontend only (tidak mengubah security backend)
+  - Form validation tetap berfungsi (required fields, email format, password min 6 chars)
+  - Register tetap hanya menghasilkan EMPLOYEE role (security fix preserved)
+- **Employee Portal Status:** TIDAK BERUBAH - semua halaman employee tetap berfungsi normal
+- **Next:** UI Enhancement modul lain jika diperlukan
+
+### 2026-07-15: Branding Rename - PresensiKu → PresensiMu
+- **Status:** Selesai
+- **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Mengubah nama sistem dari "PresensiKu" menjadi "PresensiMu" di seluruh aplikasi
+- **Files Updated (3):**
+  - `client/src/pages/Login.tsx` — PresensiKu → PresensiMu (branding title + footer copyright)
+  - `client/src/pages/Register.tsx` — PresensiKu → PresensiMu (branding title + footer copyright)
+  - `client/src/components/EmployeeLayout.tsx` — Header navbar "Absensi" → "PresensiMu"
+- **QA Test:** TypeScript compilation clean
+- **Security Test:** No security impact (branding change only)
+- **Next:** Tunggu instruksi selanjutnya
+
+### 2026-07-15: HR Module Bug Fix - White Screen & Sync Issues
+- **Status:** Selesai
+- **Flow:** Investigasi → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Fix 2 bug pada modul HR/Admin:
+  1. **Jadwal Kerja (HrSchedule.tsx) white screen** — root cause: `empRes.data.employees` should be `empRes.data.data.employees` (API returns `{ success, data: { employees, pagination } }`)
+  2. **Monitoring Absensi (HrAttendance.tsx) tidak sync** — same bug + attendance enrichment uses `employees` list which was empty
+  3. **Laporan (HrReports.tsx) employee list empty** — same bug
+- **Root Cause:** `employeeApi.list()` returns `{ success: true, data: { employees: [...], pagination: {...} } }` but frontend accessed `res.data.employees` instead of `res.data.data.employees`
+- **Files Fixed (4):**
+  - `client/src/pages/admin/HrSchedule.tsx` — `empRes.data.employees` → `empRes.data.data.employees`
+  - `client/src/pages/admin/HrAttendance.tsx` — same fix + added `r.user` as fallback in enrichment
+  - `client/src/pages/admin/HrReports.tsx` — same fix
+  - `client/src/services/hrApi.ts` — updated `employeeApi.list()` type annotation to match server response
+- **QA Test:** TypeScript compilation clean, 121 backend tests pass (no regressions)
+- **Security Test:** No security impact (data fetching fix only)
+- **Next:** Monitoring Absensi masih belum sync — investigasi date filter backend
+
+### 2026-07-15: Monitoring Absensi Date Filter Fix
+- **Status:** Selesai
+- **Flow:** Investigasi → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Monitoring Absensi menampilkan "Tidak ada data absensi" padahal data sudah ada di dashboard. Root cause: timezone mismatch pada date filter backend — `new Date("2026-07-15")` adalah midnight UTC, sedangkan `tanggal` attendance disimpan sebagai midnight timezone lokal. Akibatnya `lte` filter tidak match.
+- **Root Cause:** `admin.service.ts` `getAllAttendance()` menggunakan `lte = new Date(filters.endDate)` yang hanya sampai midnight UTC, tidak mencakup seluruh hari dalam timezone lokal.
+- **Fix:** Set `endDate` ke `23:59:59.999` agar mencakup seluruh hari:
+  ```typescript
+  // Before
+  where.tanggal.lte = new Date(filters.endDate);
+  // After
+  const end = new Date(filters.endDate);
+  end.setHours(23, 59, 59, 999);
+  where.tanggal.lte = end;
+  ```
+  Sama dengan `startDate` — set ke `00:00:00.000` explicit.
+- **File Fixed (1):**
+  - `server/src/services/admin.service.ts` — `getAllAttendance()` date filter: `start.setHours(0,0,0,0)` + `end.setHours(23,59,59,999)`
+- **QA Test:** TypeScript compilation clean, 121 backend tests pass (no regressions)
+- **Security Test:** No security impact (query filter fix only)
+- **Next:** Tunggu instruksi selanjutnya

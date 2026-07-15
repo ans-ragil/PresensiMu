@@ -7,6 +7,42 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Division {
+  id          String   @id @default(uuid())
+  nama        String   @unique
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users       User[]
+}
+
+model Position {
+  id          String   @id @default(uuid())
+  nama        String   @unique
+  description String?
+  level       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users       User[]
+}
+
+model Shift {
+  id          String   @id @default(uuid())
+  nama        String   @unique
+  jamMulai    String
+  jamSelesai  String
+  toleransiMenit Int @default(30)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users       User[]
+}
+
 model User {
   id               String          @id @default(uuid())
   nama             String
@@ -20,9 +56,16 @@ model User {
   alamat           String?
   foto             String?
   tanggalBergabung DateTime?
+  isActive         Boolean         @default(true)
+  divisiId         String?
+  jabatanId        String?
+  shiftId          String?
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
 
+  division         Division?       @relation(fields: [divisiId], references: [id])
+  position         Position?       @relation(fields: [jabatanId], references: [id])
+  shift            Shift?          @relation(fields: [shiftId], references: [id])
   attendance       Attendance[]
   schedule         Schedule[]
   leaveRequests    LeaveRequest[]  @relation("LeaveRequests")
@@ -123,4 +166,13 @@ model Notification {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, isRead])
+}
+
+model CompanySetting {
+  id            String   @id @default(uuid())
+  key           String   @unique
+  value         String
+  description   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

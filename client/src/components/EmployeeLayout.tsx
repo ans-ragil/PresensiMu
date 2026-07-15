@@ -22,7 +22,7 @@ export default function EmployeeLayout({ children }: { children: ReactNode }) {
       <header className="bg-white shadow-sm border-b sticky top-0 z-40">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
           <Link to="/employee/dashboard" className="flex items-center gap-2">
-            <span className="text-xl font-bold text-blue-600">Absensi</span>
+            <span className="text-xl font-bold text-blue-600">PresensiMu</span>
           </Link>
           <div className="flex items-center gap-3">
             {['ADMIN', 'HR', 'SUPER_ADMIN'].includes(user?.role || '') && (

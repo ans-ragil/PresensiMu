@@ -31,6 +31,13 @@ const CompanyLocation = lazy(() => import('./pages/admin/CompanyLocation'));
 const Reports = lazy(() => import('./pages/admin/Reports'));
 const EmailSettings = lazy(() => import('./pages/admin/EmailSettings'));
 
+// HR Module pages
+const HrSchedule = lazy(() => import('./pages/admin/HrSchedule'));
+const HrAttendance = lazy(() => import('./pages/admin/HrAttendance'));
+const HrLeaveApproval = lazy(() => import('./pages/admin/HrLeaveApproval'));
+const HrReports = lazy(() => import('./pages/admin/HrReports'));
+const HrSettings = lazy(() => import('./pages/admin/HrSettings'));
+
 const ADMIN_ROLES: UserRole[] = ['ADMIN', 'HR', 'SUPER_ADMIN'];
 
 const PageLoader = () => (
@@ -78,6 +85,13 @@ function App() {
             <Route path="/admin/live-tracking" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><AdminLayout><LiveTracking /></AdminLayout></ProtectedRoute>} />
             <Route path="/admin/company-location" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><AdminLayout><CompanyLocation /></AdminLayout></ProtectedRoute>} />
             <Route path="/admin/email-settings" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><AdminLayout><EmailSettings /></AdminLayout></ProtectedRoute>} />
+
+            {/* HR Module Routes */}
+            <Route path="/admin/hr/schedule" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><AdminLayout><HrSchedule /></AdminLayout></ProtectedRoute>} />
+            <Route path="/admin/hr/attendance" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><AdminLayout><HrAttendance /></AdminLayout></ProtectedRoute>} />
+            <Route path="/admin/hr/leave" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><AdminLayout><HrLeaveApproval /></AdminLayout></ProtectedRoute>} />
+            <Route path="/admin/hr/reports" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><AdminLayout><HrReports /></AdminLayout></ProtectedRoute>} />
+            <Route path="/admin/hr/settings" element={<ProtectedRoute allowedRoles={ADMIN_ROLES}><AdminLayout><HrSettings /></AdminLayout></ProtectedRoute>} />
 
             {/* Backward compatibility: old routes redirect */}
             <Route path="/dashboard" element={<Navigate to="/employee/dashboard" replace />} />

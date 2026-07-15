@@ -98,16 +98,35 @@ export class AdminService {
     return leaveRequests;
   }
 
-  async getAllAttendance(startDate?: string, endDate?: string) {
+  async getAllAttendance(filters?: { startDate?: string; endDate?: string; divisiId?: string; shiftId?: string; status?: string }) {
     const where: any = {};
 
-    if (startDate || endDate) {
+    if (filters?.startDate || filters?.endDate) {
       where.tanggal = {};
-      if (startDate) {
-        where.tanggal.gte = new Date(startDate);
+      if (filters.startDate) {
+        const start = new Date(filters.startDate);
+        start.setHours(0, 0, 0, 0);
+        where.tanggal.gte = start;
       }
-      if (endDate) {
-        where.tanggal.lte = new Date(endDate);
+      if (filters.endDate) {
+        const end = new Date(filters.endDate);
+        end.setHours(23, 59, 59, 999);
+        where.tanggal.lte = end;
+      }
+    }
+
+    if (filters?.status) {
+      where.status = filters.status;
+    }
+
+    // Filter by division or shift (requires user relation)
+    if (filters?.divisiId || filters?.shiftId) {
+      where.user = {};
+      if (filters.divisiId) {
+        where.user.divisiId = filters.divisiId;
+      }
+      if (filters.shiftId) {
+        where.user.shiftId = filters.shiftId;
       }
     }
 
@@ -122,7 +141,13 @@ export class AdminService {
           select: {
             id: true,
             nama: true,
-            email: true
+            email: true,
+            noTelp: true,
+            nik: true,
+            jabatan: true,
+            divisi: true,
+            divisiId: true,
+            shiftId: true,
           }
         }
       }

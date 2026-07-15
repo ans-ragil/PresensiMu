@@ -410,6 +410,167 @@
 
 ---
 
+## HR Module Enhancement Sprints (Post-Admin Foundation)
+
+### HR Sprint 1: Fix Critical Bugs & Manajemen Karyawan (P0-P1)
+
+#### Goals
+- Fix HrReports rendering bug (4 dari 5 laporan render JSON)
+- Buat halaman Manajemen Karyawan MUI (CRUD lengkap)
+- Buat halaman Master Data (Divisi/Position/Shift)
+
+#### Tasks
+
+##### Fix HrReports (P0)
+- [ ] Fix `HrReports.tsx` line ~310: ganti `JSON.stringify` dengan proper table rendering
+- [ ] Implementasi table untuk weekly report (Nama, Email, Hadir, Terlambat, Cuti, Izin)
+- [ ] Implementasi table untuk monthly report (Periode, Total, Hadir, Terlambat, Alpha, Cuti, Izin)
+- [ ] Implementasi table untuk employee report (Karyawan, Total Hari, Hadir, Terlambat, Alpha, Cuti, Izin)
+- [ ] Implementasi table untuk leave report (Nama, Tipe Izin, Dari, Sampai, Status)
+- [ ] Test semua 5 report type render dengan benar
+
+##### Manajemen Karyawan (P1)
+- [ ] Buat `HrEmployees.tsx` - halaman MUI untuk CRUD karyawan
+- [ ] Tabel karyawan dengan kolom: Foto, Nama, Email, NIK, Divisi, Jabatan, Shift, Status, Aksi
+- [ ] Filter: search, divisi, jabatan, shift, status (active/inactive)
+- [ ] Pagination server-side
+- [ ] Dialog tambah karyawan (form lengkap: nama, email, password, noTelp, NIK, divisi, jabatan, shift, alamat, tanggalGabung)
+- [ ] Dialog edit karyawan
+- [ ] Dialog detail karyawan (view semua data)
+- [ ] Aksi: Edit, Delete (soft), Restore, Change Password
+- [ ] Gunakan endpoint `/employees` (bukan `/admin/employees`)
+- [ ] Update AdminLayout menu: ganti "Manajemen Karyawan" → `/admin/hr/employees`
+
+##### Master Data (P1)
+- [ ] Buat `HrMasterData.tsx` - halaman MUI dengan 3 tab (Divisi/Position/Shift)
+- [ ] Tab Divisi: tabel nama, deskripsi, jumlah karyawan, CRUD
+- [ ] Tab Position: tabel nama, deskripsi, level, jumlah karyawan, CRUD
+- [ ] Tab Shift: tabel nama, jam mulai/selesai, toleransi, jumlah karyawan, CRUD
+- [ ] Dialog tambah/edit untuk setiap master data
+- [ ] Konfirmasi delete
+- [ ] Update AdminLayout menu: tambah "Master Data" di section Management
+
+#### Files to Create
+- `client/src/pages/admin/HrEmployees.tsx` (~500 lines)
+- `client/src/pages/admin/HrMasterData.tsx` (~400 lines)
+
+#### Files to Update
+- `client/src/pages/admin/HrReports.tsx` (fix rendering bug)
+- `client/src/components/AdminLayout.tsx` (add menu items)
+- `client/src/App.tsx` (add routes)
+
+#### Acceptance Criteria
+- [ ] Semua 5 report type di HrReports render sebagai tabel (bukan JSON)
+- [ ] Admin dapat CRUD karyawan dari halaman MUI
+- [ ] Admin dapat mengelola Divisi/Position/Shift dari satu halaman
+- [ ] Filter dan pagination berfungsi
+- [ ] TypeScript clean, 121 tests pass
+
+---
+
+### HR Sprint 2: Excel Import, Pagination & UX Enhancement (P1-P2)
+
+#### Goals
+- Tambahkan Excel import ke HrSchedule
+- Tambahkan pagination dan date filter ke HrLeaveApproval
+- Fix AdminLayout issues
+
+#### Tasks
+
+##### HrSchedule Excel Import (P1)
+- [ ] Tambahkan tombol "Import Excel" di HrSchedule
+- [ ] Implementasi file upload dialog (drag & drop)
+- [ ] Step 1: Upload file → preview data
+- [ ] Step 2: Review valid/invalid rows
+- [ ] Step 3: Confirm import
+- [ ] Gunakan endpoint `/admin/schedule/import/preview` dan `/admin/schedule/import`
+- [ ] Tampilkan hasil import (success count, error count, error details)
+
+##### HrLeaveApproval Enhancement (P2)
+- [ ] Tambahkan pagination (server-side, 10/25/50 per page)
+- [ ] Tambahkan date range filter (dari/sampai)
+- [ ] Tambahkan search by nama karyawan
+- [ ] Tambahkan export leave report
+
+##### AdminLayout Fix (P2)
+- [ ] Notification badge: fetch dari `/notifications` endpoint, tampilkan unread count
+- [ ] Profile menu: tambah link ke `/admin/hr/settings`
+- [ ] Pengaturan menu: tambah link ke `/admin/hr/settings`
+- [ ] Hapus menu "Lama" (Jadwal Lama, Cuti Lama, Laporan Lama) setelah HR module lengkap
+- [ ] Reorganisasi sidebar: HR Module → Management → Settings → Tracking
+
+##### Cleanup
+- [ ] Deprecate old `ScheduleManagement.tsx` (ganti dengan HrSchedule)
+- [ ] Deprecate old `LeaveManagement.tsx` (ganti dengan HrLeaveApproval)
+- [ ] Deprecate old `Reports.tsx` (ganti dengan HrReports)
+- [ ] Deprecate old `AdminAttendance.tsx` (ganti dengan HrAttendance)
+- [ ] Deprecate old `EmployeeList.tsx` (ganti dengan HrEmployees)
+- [ ] Update App.tsx: redirect old routes ke new HR routes
+
+#### Files to Create
+- (none - all enhancements ke existing files)
+
+#### Files to Update
+- `client/src/pages/admin/HrSchedule.tsx` (add Excel import)
+- `client/src/pages/admin/HrLeaveApproval.tsx` (add pagination, date filter)
+- `client/src/components/AdminLayout.tsx` (fix notifications, menu, cleanup)
+- `client/src/App.tsx` (redirect old routes)
+
+#### Acceptance Criteria
+- [ ] Excel import di HrSchedule berfungsi (upload → preview → confirm)
+- [ ] HrLeaveApproval memiliki pagination dan date filter
+- [ ] Notification badge menampilkan jumlah unread real
+- [ ] Menu "Lama" dihapus dari sidebar
+- [ ] Old routes redirect ke new HR routes
+- [ ] TypeScript clean, 121 tests pass
+
+---
+
+### HR Sprint 3: Final Integration & Polish (P2-P3)
+
+#### Goals
+- Final testing seluruh modul HR
+- Pastikan Employee Portal tetap normal
+- Update dokumentasi
+
+#### Tasks
+
+##### Integration Testing
+- [ ] Test seluruh alur HR: Login → Dashboard → Jadwal → Absensi → Cuti → Laporan → Pengaturan
+- [ ] Test CRUD karyawan end-to-end
+- [ ] Test master data CRUD
+- [ ] Test Excel import
+- [ ] Test report export (PDF/Excel/CSV)
+- [ ] Test settings save & load
+
+##### Employee Portal Verification
+- [ ] Test seluruh halaman employee: Dashboard, Absensi, Riwayat, Jadwal, Cuti, Profil, Notifikasi
+- [ ] Pastikan tidak ada regressi dari perubahan backend
+- [ ] Test clock in/out flow
+- [ ] Test leave request flow
+
+##### Documentation
+- [ ] Update README.md dengan HR module documentation
+- [ ] Update SPRINT.md dengan completion status
+- [ ] Update AGENTS.md dengan progress terbaru
+- [ ] Dokumentasikan semua API endpoints baru
+- [ ] Dokumentasikan semua file yang berubah
+
+##### Performance
+- [ ] Pastikan loading time < 3 detik untuk semua halaman
+- [ ] Optimize query untuk large dataset (100+ karyawan)
+- [ ] Test responsive design di mobile/tablet/desktop
+
+#### Acceptance Criteria
+- [ ] Seluruh modul HR berfungsi tanpa error
+- [ ] Employee Portal tidak ada regressi
+- [ ] Documentation lengkap dan up-to-date
+- [ ] Performance memenuhi standar
+- [ ] TypeScript clean, 121 tests pass
+- [ ] Security: tidak ada vulnerability baru
+
+---
+
 ## Risk & Mitigation
 
 | Sprint | Risiko | Mitigasi |
@@ -420,6 +581,11 @@
 | 4 | Import data corrupt | Preview sebelum import, validasi format |
 | 5 | Live tracking lambat | Gunakan WebSocket, caching, optimize query |
 | 6 | Export file corrupt | Validate output, test dengan data besar |
+| HR1 | Reports rendering bug | Fix JSON.stringify → proper table, test semua report type |
+| HR1 | Employee CRUD complexity | Break into small components, use existing API service layer |
+| HR2 | Excel import edge cases | Validate format, handle errors gracefully, show preview |
+| HR2 | Menu cleanup confusion | Redirect old routes, keep backward compatibility |
+| HR3 | Regression di Employee Portal | Full regression test, compare before/after |
 
 ---
 

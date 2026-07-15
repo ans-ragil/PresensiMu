@@ -9,6 +9,8 @@ import leaveRoutes from './routes/leave.routes';
 import adminRoutes from './routes/admin.routes';
 import dashboardRoutes from './routes/dashboard.routes';
 import notificationRoutes from './routes/notification.routes';
+import employeeRoutes from './routes/employee.routes';
+import settingsRoutes from './routes/settings.routes';
 import { authMiddleware } from './middleware/auth';
 import { errorHandler } from './middleware/errorHandler';
 
@@ -33,11 +35,11 @@ app.get('/api/health', (_req, res) => {
 
 // Rate limiting for auth endpoints
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // limit each IP to 10 requests per windowMs
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 20, // limit each IP to 20 requests per windowMs
   message: {
     success: false,
-    message: 'Terlalu banyak percobaan, coba lagi setelah 15 menit'
+    message: 'Terlalu banyak percobaan, coba lagi dalam 5 menit'
   },
   standardHeaders: true,
   legacyHeaders: false
@@ -50,6 +52,8 @@ app.use('/api/attendance', attendanceRoutes);
 app.use('/api/leave-request', leaveRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/employees', employeeRoutes);
+app.use('/api/settings', settingsRoutes);
 
 // Error handler
 app.use(errorHandler);

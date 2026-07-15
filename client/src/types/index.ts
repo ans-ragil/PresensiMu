@@ -1,8 +1,10 @@
+export type UserRole = 'EMPLOYEE' | 'ADMIN' | 'HR' | 'SUPER_ADMIN';
+
 export interface User {
   id: string;
   nama: string;
   email: string;
-  role: 'EMPLOYEE' | 'ADMIN';
+  role: UserRole;
   noTelp: string | null;
   nik: string | null;
   jabatan: string | null;
@@ -10,10 +12,46 @@ export interface User {
   alamat: string | null;
   foto: string | null;
   tanggalBergabung: string | null;
+  isActive?: boolean;
+  divisiId?: string | null;
+  jabatanId?: string | null;
+  shiftId?: string | null;
+  division?: Division | null;
+  position?: Position | null;
+  shift?: Shift | null;
+  createdAt?: string;
+}
+
+export interface Division {
+  id: string;
+  nama: string;
+  description: string | null;
+  isActive: boolean;
+  _count?: { users: number };
+}
+
+export interface Position {
+  id: string;
+  nama: string;
+  description: string | null;
+  level: number;
+  isActive: boolean;
+  _count?: { users: number };
+}
+
+export interface Shift {
+  id: string;
+  nama: string;
+  jamMulai: string;
+  jamSelesai: string;
+  toleransiMenit: number;
+  isActive: boolean;
+  _count?: { users: number };
 }
 
 export interface Attendance {
   id: string;
+  userId: string;
   tanggal: string;
   clockIn: string | null;
   clockOut: string | null;
@@ -22,15 +60,50 @@ export interface Attendance {
   fotoIn: string | null;
   fotoOut: string | null;
   status: string;
+  keterangan: string | null;
+  user?: User;
+  employee?: User;
 }
 
 export interface Schedule {
   id: string;
+  userId: string;
   hari: number;
   jamMulai: string;
   jamSelesai: string;
   shiftType: string;
   toleransiMenit: number;
+  user?: User;
+}
+
+export interface LeaveRequest {
+  id: string;
+  userId: string;
+  tipeIzin: string;
+  tanggalMulai: string;
+  tanggalSelesai: string;
+  keterangan: string | null;
+  bukti: string | null;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  approvedBy: string | null;
+  catatanAdmin: string | null;
+  user?: User;
+  approver?: User | null;
+  createdAt: string;
+}
+
+export interface Holiday {
+  id: string;
+  nama: string;
+  tanggal: string;
+}
+
+export interface CompanyLocation {
+  id: string;
+  nama: string;
+  latitude: number;
+  longitude: number;
+  radius: number;
 }
 
 export interface WorkDuration {
@@ -46,25 +119,6 @@ export interface MonthlyStats {
   izin: number;
   cuti: number;
   wfh: number;
-}
-
-export interface LeaveBalance {
-  cuti: number;
-  izin: number;
-}
-
-export interface PendingLeave {
-  id: string;
-  tipeIzin: string;
-  tanggalMulai: string;
-  tanggalSelesai: string;
-  status: string;
-}
-
-export interface Holiday {
-  id: string;
-  nama: string;
-  tanggal: string;
 }
 
 export interface WeeklyData {
@@ -85,9 +139,46 @@ export interface DashboardData {
   };
   monthly: {
     stats: MonthlyStats;
-    leaveBalance: LeaveBalance;
+    leaveBalance: { cuti: number; izin: number };
   };
-  pendingLeaves: PendingLeave[];
+  pendingLeaves: { id: string; tipeIzin: string; tanggalMulai: string; tanggalSelesai: string; status: string }[];
   holidays: Holiday[];
   weeklyAttendance: WeeklyData[];
+}
+
+export interface Pagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface EmployeeFilter {
+  search?: string;
+  divisiId?: string;
+  jabatanId?: string;
+  shiftId?: string;
+  isActive?: boolean;
+  page?: number;
+  limit?: number;
+}
+
+export interface DailyReport {
+  date: string;
+  totalEmployees: number;
+  hadir: number;
+  terlambat: number;
+  pulangCepat: number;
+  alpha: number;
+  cuti: number;
+  izin: number;
+  details: {
+    userId: string;
+    nama: string;
+    email: string;
+    status: string;
+    clockIn: string | null;
+    clockOut: string | null;
+    keterangan: string | null;
+  }[];
 }

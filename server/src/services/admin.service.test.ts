@@ -76,7 +76,7 @@ describe('AdminService', () => {
 
       (prisma.attendance.findMany as any).mockResolvedValue(mockAttendance);
 
-      const result = await adminService.getAllAttendance('2024-07-01', '2024-07-31');
+      const result = await adminService.getAllAttendance({ startDate: '2024-07-01', endDate: '2024-07-31' });
 
       expect(result).toEqual(mockAttendance);
     });

@@ -88,6 +88,27 @@ export const errorHandler = (
   } else if (err.message.includes('Pengaturan email tidak ditemukan')) {
     statusCode = 404;
     message = err.message;
+  } else if (err.message.includes('Karyawan tidak ditemukan')) {
+    statusCode = 404;
+    message = err.message;
+  } else if (err.message.includes('Divisi tidak ditemukan')) {
+    statusCode = 404;
+    message = err.message;
+  } else if (err.message.includes('Jabatan tidak ditemukan')) {
+    statusCode = 404;
+    message = err.message;
+  } else if (err.message.includes('Shift tidak ditemukan')) {
+    statusCode = 404;
+    message = err.message;
+  } else if (err.message.includes('Nama divisi sudah ada')) {
+    statusCode = 409;
+    message = err.message;
+  } else if (err.message.includes('Nama jabatan sudah ada')) {
+    statusCode = 409;
+    message = err.message;
+  } else if (err.message.includes('Nama shift sudah ada')) {
+    statusCode = 409;
+    message = err.message;
   }
 
   res.status(statusCode).json({

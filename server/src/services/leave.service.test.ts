@@ -10,7 +10,17 @@ vi.mock('../config/database', () => ({
       findMany: vi.fn(),
       create: vi.fn(),
       update: vi.fn()
+    },
+    user: {
+      findMany: vi.fn().mockResolvedValue([])
     }
+  }
+}));
+
+// Mock notification service
+vi.mock('./notification.service', () => ({
+  notificationService: {
+    createNotification: vi.fn().mockResolvedValue({})
   }
 }));
 

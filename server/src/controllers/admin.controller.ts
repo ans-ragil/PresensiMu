@@ -76,11 +76,14 @@ export class AdminController {
 
   async getAllAttendance(req: Request, res: Response, next: NextFunction) {
     try {
-      const { startDate, endDate } = req.query;
-      const attendance = await adminService.getAllAttendance(
-        startDate as string,
-        endDate as string
-      );
+      const { startDate, endDate, divisiId, shiftId, status } = req.query;
+      const attendance = await adminService.getAllAttendance({
+        startDate: startDate as string,
+        endDate: endDate as string,
+        divisiId: divisiId as string,
+        shiftId: shiftId as string,
+        status: status as string,
+      });
 
       res.json({
         success: true,
