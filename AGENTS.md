@@ -742,6 +742,14 @@ Agent Coding AI wajib patuhi aturan ini
 - **Results:** `/` dan `/login` masih HTTP 500; `/api/health` masih HTTP 200; login API masih HTTP 200.
 - **Conclusion:** Deployment aktif masih backend-only atau masih memakai cache/configuration lama. Perlu verifikasi visual Railway Root Directory dan Dockerfile Path.
 
+### 2026-07-15: Vercel + Turso Full Migration Assessment
+- **Status:** Perencanaan
+- **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
+- **Decision:** Gunakan satu Vercel project: Vite frontend sebagai static CDN dan Express sebagai Vercel Function, dengan Turso melalui HTTP adapter.
+- **Required Refactors:** Pisahkan Express app dari listener lokal; hapus static serving dari Express; buat Vercel API entrypoint; ubah build/workspace dan rewrite; cache Prisma client; ganti in-memory rate limit; susun migration Turso yang versioned.
+- **Constraints:** Payload function maksimum 4.5MB, function bundle standar 250MB, dan `express.static()` tidak dilayani oleh Vercel.
+- **Recommended Follow-up:** Pindahkan selfie/dokumen base64 ke Vercel Blob dan simpan URL di Turso; perkuat auth dengan HttpOnly cookie/refresh rotation.
+
 ### 2026-07-15: Railway Pricing Clarification
 - **Status:** Selesai
 - **Detail:** Railway menyediakan trial satu kali dengan kredit terbatas, tetapi hosting berkelanjutan memerlukan plan berbayar/usage billing. Alternatif deployment gratis perlu dipertimbangkan bila tidak ingin biaya bulanan.
