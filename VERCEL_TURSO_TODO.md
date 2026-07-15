@@ -15,11 +15,11 @@
 - [x] Pastikan production frontend memakai same-origin `/api`
 - [x] QA: install workspace, backend build, frontend production build
 
-## Fase 3 — Turso Serverless Reliability
-- [ ] Jadikan Prisma + LibSQL client singleton untuk warm invocation
-- [ ] Validasi environment Turso secara eksplisit
-- [ ] Perketat CORS ke origin environment yang dikenal
-- [ ] QA: TypeScript, unit test, dan koneksi Turso
+## Fase 3 — Turso Serverless Reliability ✅
+- [x] Jadikan Prisma + LibSQL client singleton untuk warm invocation
+- [x] Validasi environment Turso secara eksplisit
+- [x] Perketat CORS ke origin environment yang dikenal
+- [x] QA: TypeScript, 122 unit test, singleton, dan koneksi Turso (4 user)
 
 ## Fase 4 — Distributed Rate Limiting & Migration
 - [ ] Tambahkan model rate-limit bucket di Prisma

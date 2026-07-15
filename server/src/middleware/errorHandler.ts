@@ -13,7 +13,10 @@ export const errorHandler = (
   let message = 'Internal Server Error';
 
   // Custom error messages
-  if (err.message === 'Email sudah terdaftar') {
+  if (err.message === 'Origin tidak diizinkan oleh CORS') {
+    statusCode = 403;
+    message = err.message;
+  } else if (err.message === 'Email sudah terdaftar') {
     statusCode = 409;
     message = err.message;
   } else if (err.message === 'Email atau password salah') {

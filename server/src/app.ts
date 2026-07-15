@@ -30,21 +30,29 @@ app.get('/api/health', (_req, res) => {
 // Middleware
 app.use(helmet());
 
-const allowedOrigins = [
+const toOrigin = (value?: string) => {
+  if (!value) return null;
+  return value.startsWith('http://') || value.startsWith('https://')
+    ? value.replace(/\/$/, '')
+    : `https://${value.replace(/\/$/, '')}`;
+};
+
+const allowedOrigins = new Set([
   'http://localhost:5173',
   'http://localhost:3000',
-  process.env.CORS_ORIGIN,
-].filter(Boolean) as string[];
+  toOrigin(process.env.APP_URL),
+  toOrigin(process.env.CORS_ORIGIN),
+  toOrigin(process.env.VERCEL_URL),
+  toOrigin(process.env.VERCEL_PROJECT_PRODUCTION_URL),
+].filter((origin): origin is string => Boolean(origin)));
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow same-origin requests (no origin header)
-    if (!origin) return callback(null, true);
-    // Allow whitelisted origins
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    // Allow Railway and Vercel domains
-    if (origin.endsWith('.railway.app') || origin.endsWith('.vercel.app')) return callback(null, true);
-    callback(new Error('Not allowed by CORS'));
+    // Requests without Origin include server-to-server and same-origin navigation.
+    if (!origin || allowedOrigins.has(origin.replace(/\/$/, ''))) {
+      return callback(null, true);
+    }
+    return callback(new Error('Origin tidak diizinkan oleh CORS'));
   },
   credentials: true
 }));

@@ -27,6 +27,17 @@ describe('Error Handler Middleware', () => {
     });
   });
 
+  it('should return 403 for rejected CORS origins', () => {
+    const error = new Error('Origin tidak diizinkan oleh CORS');
+    errorHandler(error, mockReq, mockRes, mockNext);
+
+    expect(mockRes.status).toHaveBeenCalledWith(403);
+    expect(mockRes.json).toHaveBeenCalledWith({
+      success: false,
+      message: 'Origin tidak diizinkan oleh CORS'
+    });
+  });
+
   it('should return 409 for duplicate email', () => {
     const error = new Error('Email sudah terdaftar');
     errorHandler(error, mockReq, mockRes, mockNext);
