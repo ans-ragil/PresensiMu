@@ -3,7 +3,6 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
-import path from 'path';
 import prisma from './config/database';
 import authRoutes from './routes/auth.routes';
 import attendanceRoutes from './routes/attendance.routes';
@@ -19,7 +18,6 @@ import { errorHandler } from './middleware/errorHandler';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
 
 // Trust proxy (Railway, Vercel, etc.)
 app.set('trust proxy', 1);
@@ -72,22 +70,12 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/employees', employeeRoutes);
 app.use('/api/settings', settingsRoutes);
 
-// Serve frontend static files (production)
-const clientDistPath = path.join(__dirname, '../../client/dist');
-app.use(express.static(clientDistPath));
-
-// SPA fallback — semua non-API route serve index.html
-app.get('*', (req, res, next) => {
-  if (req.path.startsWith('/api')) return next();
-  res.sendFile(path.join(clientDistPath, 'index.html'));
+// API fallback. Frontend routing/static assets are handled by Vercel's CDN.
+app.use('/api', (_req, res) => {
+  res.status(404).json({ success: false, message: 'Endpoint tidak ditemukan' });
 });
 
 // Error handler
 app.use(errorHandler);
-
-// Start server
-app.listen(Number(PORT), '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT}`);
-});
 
 export default app;
