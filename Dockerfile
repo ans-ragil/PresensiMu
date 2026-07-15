@@ -12,12 +12,12 @@ RUN cd client && npm ci
 COPY client/ ./client/
 RUN cd client && npm run build
 
-# Copy server
+# Copy server - use npm install to regenerate platform-specific binaries
 COPY server/package*.json ./server/
-RUN cd server && npm ci
-RUN cd server && npx prisma generate
+RUN cd server && npm install
 
 COPY server/ ./server/
+RUN cd server && npx prisma generate
 RUN cd server && npm run build
 
 EXPOSE 5000
