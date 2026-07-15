@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import ExcelJS from 'exceljs';
 import { ScheduleService } from './schedule.service';
 
 // Mock prisma
@@ -125,6 +126,32 @@ describe('ScheduleService', () => {
       await expect(
         scheduleService.deleteSchedule('nonexistent')
       ).rejects.toThrow('Jadwal tidak ditemukan');
+    });
+  });
+
+  describe('previewImport', () => {
+    it('parses schedule rows with ExcelJS', async () => {
+      const workbook = new ExcelJS.Workbook();
+      const sheet = workbook.addWorksheet('Jadwal');
+      sheet.addRow(['email', 'hari', 'jam_mulai', 'jam_selesai', 'shift_type', 'toleransi_menit']);
+      sheet.addRow(['test@test.com', 1, '08:00', '17:00', 'NORMAL', 15]);
+      const file = Buffer.from(await workbook.xlsx.writeBuffer());
+
+      (prisma.user.findUnique as any).mockResolvedValue({ id: 'user-id', nama: 'Test' });
+      (prisma.schedule.findUnique as any).mockResolvedValue(null);
+
+      const result = await scheduleService.previewImport(file);
+
+      expect(result.summary).toEqual({ total: 1, valid: 1, error: 0, skip: 0 });
+      expect(result.rows[0]).toMatchObject({
+        row: 2,
+        email: 'test@test.com',
+        hari: 1,
+        jamMulai: '08:00',
+        jamSelesai: '17:00',
+        toleransiMenit: 15,
+        status: 'valid'
+      });
     });
   });
 

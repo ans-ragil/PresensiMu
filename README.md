@@ -93,8 +93,8 @@ Sistem presensi digital berbasis web untuk pencatatan kehadiran karyawan secara 
 | Node.js | Runtime JavaScript |
 | Express.js | Web framework |
 | TypeScript | Type-safe JavaScript |
-| Prisma | Database ORM |
-| PostgreSQL | Database |
+| Prisma + LibSQL Adapter | Database ORM |
+| Turso (LibSQL/SQLite) | Serverless database |
 | JWT + bcrypt | Autentikasi & enkripsi password |
 | Leaflet + OpenStreetMap | Maps & GPS |
 | ExcelJS + PDFKit | Export laporan |
@@ -116,8 +116,9 @@ Sistem presensi digital berbasis web untuk pencatatan kehadiran karyawan secara 
 
 | Teknologi | Fungsi |
 |-----------|--------|
-| Docker + Docker Compose | Containerization |
-| Nginx | Reverse proxy |
+| Vercel Static CDN | Hosting frontend Vite |
+| Vercel Functions | Hosting Express API |
+| Turso Cloud | Database LibSQL serverless |
 
 ---
 
@@ -186,9 +187,12 @@ PresensiMu/
 │   │   └── theme/                   # MUI theme config
 │   └── package.json
 │
+├── api/
+│   └── [...path].ts                 # Catch-all Vercel Function
 ├── server/                          # Backend Express
 │   ├── src/
-│   │   ├── app.ts                   # Express app setup
+│   │   ├── app.ts                   # Express app (tanpa listener)
+│   │   ├── index.ts                 # Listener untuk local development
 │   │   ├── config/                  # Database config
 │   │   ├── controllers/             # Request handlers
 │   │   ├── middleware/               # Auth, RBAC, error handler
@@ -197,13 +201,13 @@ PresensiMu/
 │   │   └── utils/                   # Helpers (JWT, location, export)
 │   ├── prisma/
 │   │   ├── schema.prisma            # Database schema
-│   │   └── seed.ts                  # Seed data
+│   │   ├── migrations-turso/        # Versioned Turso SQL migrations
+│   │   ├── migrate-turso.ts         # Idempotent migration runner
+│   │   └── seed-turso.ts            # Turso seed data
 │   └── package.json
 │
-├── nginx/                           # Nginx config
-├── docker-compose.yml               # Docker orchestration
-├── deploy.sh                        # Deploy script (Linux/Mac)
-└── deploy.bat                       # Deploy script (Windows)
+├── package.json                     # npm workspaces
+└── vercel.json                      # Build, function, dan SPA routing
 ```
 
 ---
@@ -214,8 +218,8 @@ PresensiMu/
 
 - [Node.js](https://nodejs.org/) v20 atau lebih tinggi
 - [npm](https://www.npmjs.com/) v10 atau lebih tinggi
-- [PostgreSQL](https://www.postgresql.org/) v14 atau lebih tinggi
-- (Opsional) [Docker & Docker Compose](https://docs.docker.com/get-docker/)
+- Akun dan database [Turso](https://turso.tech/)
+- (Opsional) [Vercel CLI](https://vercel.com/docs/cli) untuk simulasi production lokal
 
 ### 1. Clone Repository
 
@@ -224,40 +228,30 @@ git clone https://github.com/ans-ragil/PresensiMu.git
 cd PresensiMu
 ```
 
-### 2. Setup Backend
+### 2. Setup Workspace dan Database
 
 ```bash
-cd server
-
-# Install dependencies
+# Install seluruh workspace
 npm install
 
-# Buat file .env (sesuaikan dengan konfigurasi database Anda)
-cp ../.env.example .env
+# Buat environment lokal dan isi credential Turso
+cp .env.example server/.env
 
-# Generate Prisma client
-npx prisma generate
+# Generate Prisma client dan jalankan migration Turso
+npm run db:generate --workspace=server
+npm run db:migrate:turso --workspace=server
 
-# Jalankan migration
-npx prisma migrate dev
-
-# Seed database dengan data default
-npm run db:seed
-
-# Jalankan development server
-npm run dev
+# Seed akun default bila database masih kosong
+npm run db:seed:turso --workspace=server
 ```
 
-### 3. Setup Frontend
+### 3. Jalankan Development
+
+Gunakan dua terminal:
 
 ```bash
-cd client
-
-# Install dependencies
-npm install
-
-# Jalankan development server
-npm run dev
+npm run dev:server
+npm run dev:client
 ```
 
 ### 4. Buka Browser
@@ -301,21 +295,29 @@ Akses:
 
 ## Environment Variables
 
-### Server (.env)
+### Server (`server/.env` lokal atau Vercel Environment Variables)
 
 ```env
-# Database
-DATABASE_URL=postgresql://postgres:password@localhost:5432/absensi_db
+# Prisma CLI only
+DATABASE_URL=file:./dev.db
+
+# Turso runtime
+TURSO_DATABASE_URL=libsql://your-database-your-org.turso.io
+TURSO_AUTH_TOKEN=replace-with-a-new-turso-token
 
 # JWT
-JWT_SECRET=your-secret-key-here
+JWT_SECRET=replace-with-at-least-32-random-characters
 JWT_EXPIRES_IN=30m
 REFRESH_TOKEN_EXPIRES_IN=7d
 
-# Server
+# Lokal saja
 PORT=5000
+NODE_ENV=development
+APP_URL=http://localhost:5173
 CORS_ORIGIN=http://localhost:5173
 ```
+
+> Jangan membuat `VITE_*` variable untuk token Turso. Variable dengan prefix tersebut akan masuk ke bundle browser.
 
 ---
 
@@ -422,7 +424,7 @@ cd server
 npm test
 ```
 
-**Hasil: 121/121 tests passed** (16 test files)
+**Hasil: 127/127 tests passed** (17 test files)
 
 | Module | Tests |
 |--------|-------|
@@ -468,33 +470,32 @@ npm test
 
 ---
 
-## Deployment
+## Deployment — Vercel + Turso
 
-### Docker Production
-
-```bash
-# Build and start
-docker-compose up -d --build
-
-# View logs
-docker-compose logs -f
-
-# Stop
-docker-compose down
-```
-
-### Manual Production
+1. Buat database Turso dan token baru.
+2. Jalankan migration sekali dari terminal tepercaya:
 
 ```bash
-# Build server
-cd server && npm run build
-
-# Build client
-cd client && npm run build
-
-# Start server
-cd server && npm start
+npm run db:migrate:turso --workspace=server
+npm run db:seed:turso --workspace=server
 ```
+
+3. Import repository ke Vercel dengan **Root Directory repository root**.
+4. Tambahkan Environment Variables untuk Production dan Preview:
+
+```env
+DATABASE_URL=file:./dev.db
+TURSO_DATABASE_URL=libsql://your-database-your-org.turso.io
+TURSO_AUTH_TOKEN=your-new-token
+JWT_SECRET=your-random-production-secret
+JWT_EXPIRES_IN=30m
+REFRESH_TOKEN_EXPIRES_IN=7d
+```
+
+5. Deploy. Vercel menjalankan `npm run vercel-build`, menerbitkan `client/dist` ke CDN, dan menjalankan `api/[...path].ts` sebagai Function.
+6. Verifikasi `/api/health`, `/login`, login employee, login admin, dan RBAC.
+
+> Rotasi token Turso segera jika pernah masuk log, chat, atau commit Git.
 
 ---
 

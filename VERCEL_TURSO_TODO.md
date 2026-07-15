@@ -28,10 +28,10 @@
 - [x] Tambahkan migration awal + rate-limit
 - [x] QA: 126 tests, migration cloud applied + idempotent, login sukses, bucket Turso tercatat
 
-## Fase 5 — QA, Security, dan Dokumentasi
-- [ ] Jalankan seluruh backend tests
-- [ ] Jalankan frontend production build
-- [ ] Audit bundle/dependency dan secret tracking
-- [ ] Update `.env.example`, README, dan AGENTS.md
-- [ ] Dokumentasikan environment variables dan langkah deploy Vercel
-- [ ] Final verification checklist
+## Fase 5 — QA, Security, dan Dokumentasi ✅
+- [x] Jalankan seluruh backend tests — 127/127 lulus
+- [x] Jalankan frontend production build — sukses
+- [x] Audit bundle/dependency dan secret tracking — high vulnerability dihapus; 2 moderate transitif terdokumentasi
+- [x] Update `.env.example`, README, dan AGENTS.md
+- [x] Dokumentasikan environment variables dan langkah deploy Vercel
+- [x] Final verification: config valid, API entry bundle 128KB, migration idempotent, Turso/login aktif

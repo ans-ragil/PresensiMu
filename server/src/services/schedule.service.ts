@@ -1,5 +1,5 @@
 import prisma from '../config/database';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 
 interface CreateScheduleInput {
   userId: string;
@@ -196,10 +196,46 @@ export class ScheduleService {
   }
 
   async previewImport(fileBuffer: Buffer) {
-    const workbook = XLSX.read(fileBuffer, { type: 'buffer' });
-    const sheetName = workbook.SheetNames[0];
-    const sheet = workbook.Sheets[sheetName];
-    const data = XLSX.utils.sheet_to_json(sheet);
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(fileBuffer as any);
+    const sheet = workbook.worksheets[0];
+
+    if (!sheet) {
+      throw new Error('File Excel tidak memiliki worksheet');
+    }
+
+    const headerRow = sheet.getRow(1);
+    const headers = new Map<string, number>();
+    headerRow.eachCell((cell, column) => {
+      headers.set(String(cell.text).trim().toLowerCase(), column);
+    });
+
+    const getCellValue = (rowNumber: number, header: string) => {
+      const column = headers.get(header);
+      if (!column) return undefined;
+      const cell = sheet.getRow(rowNumber).getCell(column);
+      return cell.value === null ? undefined : cell.text.trim();
+    };
+
+    const data: Record<string, any>[] = [];
+    for (let rowNumber = 2; rowNumber <= sheet.rowCount; rowNumber++) {
+      const email = getCellValue(rowNumber, 'email');
+      const hariText = getCellValue(rowNumber, 'hari');
+      const jamMulai = getCellValue(rowNumber, 'jam_mulai');
+      const jamSelesai = getCellValue(rowNumber, 'jam_selesai');
+
+      if (!email && hariText === undefined && !jamMulai && !jamSelesai) continue;
+
+      data.push({
+        __row: rowNumber,
+        email,
+        hari: hariText === undefined || hariText === '' ? undefined : Number(hariText),
+        jam_mulai: jamMulai,
+        jam_selesai: jamSelesai,
+        shift_type: getCellValue(rowNumber, 'shift_type'),
+        toleransi_menit: Number(getCellValue(rowNumber, 'toleransi_menit') || 30)
+      });
+    }
 
     const rows: Array<{
       row: number;
@@ -216,7 +252,7 @@ export class ScheduleService {
 
     for (let i = 0; i < data.length; i++) {
       const row = data[i] as any;
-      const rowNum = i + 2;
+      const rowNum = row.__row;
 
       const entry: any = {
         row: rowNum,

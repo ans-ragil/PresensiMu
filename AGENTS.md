@@ -750,6 +750,20 @@ Agent Coding AI wajib patuhi aturan ini
 - **Constraints:** Payload function maksimum 4.5MB, function bundle standar 250MB, dan `express.static()` tidak dilayani oleh Vercel.
 - **Recommended Follow-up:** Pindahkan selfie/dokumen base64 ke Vercel Blob dan simpan URL di Turso; perkuat auth dengan HttpOnly cookie/refresh rotation.
 
+### 2026-07-15: Full Vercel + Turso Migration Implementation
+- **Status:** Selesai
+- **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Menyelesaikan migrasi deployment production dari Railway ke satu Vercel project dengan Vite static CDN, Express Vercel Function, dan Turso database.
+- **Architecture:** `client/dist` dilayani Vercel CDN; `api/[...path].ts` menjalankan Express; `server/src/index.ts` hanya untuk local listener; Prisma/LibSQL singleton dipakai pada warm invocation.
+- **Files Added:** `VERCEL_TURSO_TODO.md`, `api/[...path].ts`, `server/src/index.ts`, `server/src/middleware/tursoRateLimitStore.ts` + tests, `server/prisma/migrate-turso.ts`, `server/prisma/migrations-turso/*.sql`.
+- **Files Updated:** workspace root package files, `vercel.json`, Express app/CORS/error handling, Prisma schema/config, schedule import parser, environment examples, README.
+- **Files Removed:** Railway/Nixpacks production configs, obsolete Turso schema push script, duplicate client Vercel config, tracked local database.
+- **Database:** Versioned/idempotent Turso migrations diterapkan; rate-limit bucket tersedia; rerun migration aman.
+- **QA Test:** 17 files, 127/127 backend tests pass; backend TypeScript clean; frontend production build sukses; API entry bundle check 128KB; Turso singleton/query/login smoke test sukses.
+- **Security Test:** Secret asli dihapus dari working tree; local DB tidak lagi tracked; high-severity `xlsx` vulnerability dihapus dengan migrasi parser ke ExcelJS; CORS wildcard dihapus; auth rate limit terdistribusi via Turso.
+- **Residual Risk:** 2 advisory moderate berasal dari `uuid@8` transitif ExcelJS; penggunaan proyek hanya UUID v4 internal ExcelJS tanpa buffer input. Monitor upgrade upstream.
+- **Mandatory Manual Action:** Rotasi Turso token yang pernah ter-commit/terekspos dan set token baru di Vercel sebelum deploy.
+
 ### 2026-07-15: Railway Pricing Clarification
 - **Status:** Selesai
 - **Detail:** Railway menyediakan trial satu kali dengan kredit terbatas, tetapi hosting berkelanjutan memerlukan plan berbayar/usage billing. Alternatif deployment gratis perlu dipertimbangkan bila tidak ingin biaya bulanan.
