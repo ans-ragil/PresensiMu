@@ -626,3 +626,28 @@ Agent Coding AI wajib patuhi aturan ini
   - Error handling tidak membuka informasi sensitif (hanya pesan umum)
   - Rate limit (20/5min) tetap berlaku
 - **Next:** Deploy ke Vercel + Railway, atau lanjut fitur lain
+
+### 2026-07-15: Railway Backend Deployment Fix
+- **Status:** Selesai
+- **Flow:** Investigasi → Implementasi → QA Test → Security Test → Update Docs
+- **Detail:** Fix backend deployment ke Railway — 3 masalah ditemukan:
+  1. **Prisma schema pakai SQLite** — Railway butuh PostgreSQL
+  2. **Tidak ada `railway.json`** — Railway tidak tahu cara build monorepo
+  3. **Build script tidak include Prisma generate** — Prisma client harus di-generate sebelum TypeScript compile
+- **Files Updated (3):**
+  - `server/prisma/schema.prisma` — provider `sqlite` → `postgresql`
+  - `server/package.json` — build script: `tsc` → `prisma generate && tsc`
+  - `client/.env.production` — URL: `presensimu-api.up.railway.app` → `presensimu-production.up.railway.app`
+- **Files Created (2):**
+  - `railway.json` — monorepo deployment config (`buildContext: "server"`)
+  - `server/.env.example` — environment variables template
+- **QA Test:** TypeScript compilation clean (frontend + backend), 121 backend tests pass
+- **Security Test:** PostgreSQL connection uses DATABASE_URL env var (no hardcoded credentials)
+- **Deployment Steps for User:**
+  1. Add PostgreSQL addon on Railway (database tab)
+  2. Set `DATABASE_URL` in Railway environment variables (from PostgreSQL addon)
+  3. Run `prisma db push` to create tables (via Railway shell or locally)
+  4. Run `prisma db seed` to seed data
+  5. Set `VITE_API_URL` in Vercel environment variables = `https://presensimu-production.up.railway.app/api`
+  6. Redeploy both Vercel and Railway
+- **Next:** Jalankan deployment steps, test login
