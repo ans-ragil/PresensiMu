@@ -726,3 +726,7 @@ Agent Coding AI wajib patuhi aturan ini
 ### 2026-07-15: Railway Public Domain Guidance
 - **Status:** Selesai
 - **Detail:** Menjelaskan pembuatan domain melalui Service → Settings/Networking → Public Networking → Generate Domain, pengujian `/api/health`, dan penyelarasan `CORS_ORIGIN`.
+
+### 2026-07-15: Railway Frontend Access Guidance
+- **Status:** Selesai
+- **Detail:** Menetapkan bahwa frontend deployment gabungan diakses langsung dari root public domain Railway; `/api/*` hanya untuk backend dan route React seperti `/login` dilayani melalui SPA fallback.
