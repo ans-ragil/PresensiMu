@@ -754,8 +754,8 @@ Agent Coding AI wajib patuhi aturan ini
 - **Status:** Selesai
 - **Flow:** Perencanaan → Implementasi → QA Test → Security Test → Update Docs
 - **Detail:** Menyelesaikan migrasi deployment production dari Railway ke satu Vercel project dengan Vite static CDN, Express Vercel Function, dan Turso database.
-- **Architecture:** `client/dist` dilayani Vercel CDN; `api/[...path].ts` menjalankan Express; `server/src/index.ts` hanya untuk local listener; Prisma/LibSQL singleton dipakai pada warm invocation.
-- **Files Added:** `VERCEL_TURSO_TODO.md`, `api/[...path].ts`, `server/src/index.ts`, `server/src/middleware/tursoRateLimitStore.ts` + tests, `server/prisma/migrate-turso.ts`, `server/prisma/migrations-turso/*.sql`.
+- **Architecture:** `client/dist` dilayani Vercel CDN; `api/index.ts` menjalankan Express melalui rewrite `/api/:path*`; `server/src/index.ts` hanya untuk local listener; Prisma/LibSQL singleton dipakai pada warm invocation.
+- **Files Added:** `VERCEL_TURSO_TODO.md`, `api/index.ts`, `server/src/index.ts`, `server/src/middleware/tursoRateLimitStore.ts` + tests, `server/prisma/migrate-turso.ts`, `server/prisma/migrations-turso/*.sql`.
 - **Files Updated:** workspace root package files, `vercel.json`, Express app/CORS/error handling, Prisma schema/config, schedule import parser, environment examples, README.
 - **Files Removed:** Railway/Nixpacks production configs, obsolete Turso schema push script, duplicate client Vercel config, tracked local database.
 - **Database:** Versioned/idempotent Turso migrations diterapkan; rate-limit bucket tersedia; rerun migration aman.
@@ -769,6 +769,12 @@ Agent Coding AI wajib patuhi aturan ini
 - **Error:** `Missing script: vercel-build`, workspace `absensi-client`, location `/vercel/path0/client`.
 - **Root Cause:** Vercel Project Root Directory masih `client`, sehingga root workspace package, root `vercel.json`, dan `api/[...path].ts` tidak masuk deployment context.
 - **Required Action:** Set Vercel Root Directory ke repository root (`./`), Framework Preset `Other`, lalu redeploy tanpa override build/output settings.
+
+### 2026-07-15: Vercel Nested API Route Fix
+- **Status:** Selesai
+- **Live Diagnosis:** `/api/health` HTTP 200 tetapi `/api/auth/login` HTTP 404 dari platform sebelum Express.
+- **Root Cause:** Dynamic file `api/[...path].ts` hanya menangani route yang cocok pada deployment ini dan tidak meneruskan nested API path secara konsisten.
+- **Fix:** Ganti dengan single `api/index.ts`; tambahkan rewrite `/api/:path*` → `/api`; pertahankan SPA fallback hanya untuk non-API.
 
 ### 2026-07-15: Railway Pricing Clarification
 - **Status:** Selesai

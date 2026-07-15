@@ -3,7 +3,7 @@
 ## Fase 1 — Fondasi Serverless ✅
 - [x] Pisahkan konfigurasi Express dari `app.listen()`
 - [x] Tambahkan local server entrypoint `server/src/index.ts`
-- [x] Tambahkan Vercel Function catch-all `api/[...path].ts`
+- [x] Tambahkan single Vercel Function `api/index.ts` + rewrite `/api/:path*`
 - [x] Hapus static serving frontend dari Express
 - [x] Tambahkan API 404 handler
 - [x] QA: TypeScript backend dan 121 unit test

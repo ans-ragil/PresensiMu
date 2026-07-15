@@ -188,7 +188,7 @@ PresensiMu/
 │   └── package.json
 │
 ├── api/
-│   └── [...path].ts                 # Catch-all Vercel Function
+│   └── index.ts                     # Single Express Vercel Function
 ├── server/                          # Backend Express
 │   ├── src/
 │   │   ├── app.ts                   # Express app (tanpa listener)
@@ -492,7 +492,7 @@ JWT_EXPIRES_IN=30m
 REFRESH_TOKEN_EXPIRES_IN=7d
 ```
 
-5. Deploy. Vercel menjalankan `npm run vercel-build`, menerbitkan `client/dist` ke CDN, dan menjalankan `api/[...path].ts` sebagai Function.
+5. Deploy. Vercel menjalankan `npm run vercel-build`, menerbitkan `client/dist` ke CDN, lalu me-rewrite seluruh `/api/*` ke `api/index.ts`.
 6. Verifikasi `/api/health`, `/login`, login employee, login admin, dan RBAC.
 
 > Rotasi token Turso segera jika pernah masuk log, chat, atau commit Git.
