@@ -764,6 +764,12 @@ Agent Coding AI wajib patuhi aturan ini
 - **Residual Risk:** 2 advisory moderate berasal dari `uuid@8` transitif ExcelJS; penggunaan proyek hanya UUID v4 internal ExcelJS tanpa buffer input. Monitor upgrade upstream.
 - **Mandatory Manual Action:** Rotasi Turso token yang pernah ter-commit/terekspos dan set token baru di Vercel sebelum deploy.
 
+### 2026-07-15: Vercel Workspace Build Error Diagnosis
+- **Status:** Terdiagnosis
+- **Error:** `Missing script: vercel-build`, workspace `absensi-client`, location `/vercel/path0/client`.
+- **Root Cause:** Vercel Project Root Directory masih `client`, sehingga root workspace package, root `vercel.json`, dan `api/[...path].ts` tidak masuk deployment context.
+- **Required Action:** Set Vercel Root Directory ke repository root (`./`), Framework Preset `Other`, lalu redeploy tanpa override build/output settings.
+
 ### 2026-07-15: Railway Pricing Clarification
 - **Status:** Selesai
 - **Detail:** Railway menyediakan trial satu kali dengan kredit terbatas, tetapi hosting berkelanjutan memerlukan plan berbayar/usage billing. Alternatif deployment gratis perlu dipertimbangkan bila tidak ingin biaya bulanan.
