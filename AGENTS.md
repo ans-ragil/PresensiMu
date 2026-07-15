@@ -722,3 +722,7 @@ Agent Coding AI wajib patuhi aturan ini
 - **Status:** Selesai
 - **Detail:** Menetapkan variable deployment satu-service Railway: `DATABASE_URL`, `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `JWT_SECRET`, expiry token, `NODE_ENV`, dan `CORS_ORIGIN`. `VITE_API_URL` serta `PORT` tidak perlu diset.
 - **Security:** Turso token yang pernah terekspos harus dirotasi sebelum digunakan di production.
+
+### 2026-07-15: Railway Public Domain Guidance
+- **Status:** Selesai
+- **Detail:** Menjelaskan pembuatan domain melalui Service → Settings/Networking → Public Networking → Generate Domain, pengujian `/api/health`, dan penyelarasan `CORS_ORIGIN`.
