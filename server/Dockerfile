@@ -31,4 +31,4 @@ COPY --from=builder /app/prisma ./prisma
 
 EXPOSE 5000
 
-CMD ["sh", "-c", "npx prisma db push --accept-data-loss && node dist/app.js"]
+CMD ["node", "dist/app.js"]
