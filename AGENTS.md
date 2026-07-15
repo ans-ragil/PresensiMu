@@ -736,3 +736,8 @@ Agent Coding AI wajib patuhi aturan ini
 - **Domain:** `presensimu-production.up.railway.app`
 - **Results:** `/api/health` HTTP 200; `POST /api/auth/login` HTTP 200 dan credential admin valid; `/` dan `/login` HTTP 500 karena frontend `index.html` tidak tersedia dalam container.
 - **Conclusion:** Login backend/Turso bukan masalah. Railway masih menjalankan build context backend-only (`/server`) sehingga `client/dist` tidak ikut ter-build.
+
+### 2026-07-15: Railway Domain Recheck
+- **Status:** Belum berubah
+- **Results:** `/` dan `/login` masih HTTP 500; `/api/health` masih HTTP 200; login API masih HTTP 200.
+- **Conclusion:** Deployment aktif masih backend-only atau masih memakai cache/configuration lama. Perlu verifikasi visual Railway Root Directory dan Dockerfile Path.
