@@ -776,6 +776,11 @@ Agent Coding AI wajib patuhi aturan ini
 - **Root Cause:** Dynamic file `api/[...path].ts` hanya menangani route yang cocok pada deployment ini dan tidak meneruskan nested API path secara konsisten.
 - **Fix:** Ganti dengan single `api/index.ts`; tambahkan rewrite `/api/:path*` → `/api`; pertahankan SPA fallback hanya untuk non-API.
 
+### 2026-07-15: Vercel Login 500 Database Diagnostics
+- **Status:** Implementasi diagnostic
+- **Observation:** Setelah routing fix aktif, login berubah dari platform 404 menjadi Express 500; health dasar tetap 200 dan CORS origin benar.
+- **Action:** Tambahkan `/api/health/database` untuk menguji koneksi tabel User dan RateLimitBucket secara terpisah tanpa mengekspos record atau credential.
+
 ### 2026-07-15: Railway Pricing Clarification
 - **Status:** Selesai
 - **Detail:** Railway menyediakan trial satu kali dengan kredit terbatas, tetapi hosting berkelanjutan memerlukan plan berbayar/usage billing. Alternatif deployment gratis perlu dipertimbangkan bila tidak ingin biaya bulanan.

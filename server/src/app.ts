@@ -23,9 +23,36 @@ const app = express();
 // Trust proxy (Railway, Vercel, etc.)
 app.set('trust proxy', 1);
 
-// Health check
+// Health checks
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+app.get('/api/health/database', async (_req, res) => {
+  const components = { users: 'unknown', rateLimit: 'unknown' };
+
+  try {
+    await prisma.user.count();
+    components.users = 'ok';
+  } catch (error) {
+    components.users = 'error';
+    console.error('Database health (users):', error instanceof Error ? error.message : error);
+  }
+
+  try {
+    await prisma.rateLimitBucket.count();
+    components.rateLimit = 'ok';
+  } catch (error) {
+    components.rateLimit = 'error';
+    console.error('Database health (rateLimit):', error instanceof Error ? error.message : error);
+  }
+
+  const healthy = components.users === 'ok' && components.rateLimit === 'ok';
+  res.status(healthy ? 200 : 503).json({
+    status: healthy ? 'ok' : 'degraded',
+    database: components,
+    timestamp: new Date().toISOString()
+  });
 });
 
 // Middleware
