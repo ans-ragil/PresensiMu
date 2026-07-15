@@ -717,3 +717,8 @@ Agent Coding AI wajib patuhi aturan ini
 - **Fix:** Production selalu menggunakan same-origin `/api`; environment variable `VITE_API_URL` hanya dipakai saat development. `client/.env.production` juga tidak dimasukkan Docker context.
 - **QA Test:** Frontend production build sukses; bundle tidak mengandung `presensimu-api.railway.app`; backend TypeScript clean dan 121/121 tests pass.
 - **Security Test:** Same-origin API mengurangi kebutuhan CORS lintas domain dan mencegah request login terkirim ke host backend yang salah.
+
+### 2026-07-15: Railway Final Environment Variables Guidance
+- **Status:** Selesai
+- **Detail:** Menetapkan variable deployment satu-service Railway: `DATABASE_URL`, `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `JWT_SECRET`, expiry token, `NODE_ENV`, dan `CORS_ORIGIN`. `VITE_API_URL` serta `PORT` tidak perlu diset.
+- **Security:** Turso token yang pernah terekspos harus dirotasi sebelum digunakan di production.
