@@ -81,10 +81,14 @@ app.use(errorHandler);
 if (process.env.VERCEL !== '1') {
   try {
     console.log('Running database migration...');
-    execSync('npx prisma db push --accept-data-loss', { stdio: 'inherit' });
+    execSync('npx prisma db push --accept-data-loss --schema ./prisma/schema.prisma', { 
+      stdio: 'inherit', 
+      timeout: 30000,
+      cwd: process.cwd()
+    });
     console.log('Database migration completed.');
   } catch (err) {
-    console.error('Database migration failed:', err);
+    console.error('Database migration failed (non-fatal):', (err as Error).message);
   }
 }
 
