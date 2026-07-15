@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
+import prisma from './config/database';
 import authRoutes from './routes/auth.routes';
 import attendanceRoutes from './routes/attendance.routes';
 import leaveRoutes from './routes/leave.routes';
@@ -21,7 +22,7 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(helmet());
-// CORS: support multiple origins (local dev + Vercel production)
+
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
@@ -30,15 +31,9 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, curl, etc.)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    // Also allow any Vercel preview deployment
-    if (origin.endsWith('.vercel.app')) {
-      return callback(null, true);
-    }
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    if (origin.endsWith('.vercel.app')) return callback(null, true);
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true
@@ -51,14 +46,11 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Rate limiting for auth endpoints
+// Rate limiting
 const authLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // 5 minutes
-  max: 20, // limit each IP to 20 requests per windowMs
-  message: {
-    success: false,
-    message: 'Terlalu banyak percobaan, coba lagi dalam 5 menit'
-  },
+  windowMs: 5 * 60 * 1000,
+  max: 20,
+  message: { success: false, message: 'Terlalu banyak percobaan, coba lagi dalam 5 menit' },
   standardHeaders: true,
   legacyHeaders: false
 });
@@ -76,25 +68,17 @@ app.use('/api/settings', settingsRoutes);
 // Error handler
 app.use(errorHandler);
 
-// Only start server in non-Vercel environments (local dev, Docker)
-if (process.env.VERCEL !== '1') {
-  process.on('uncaughtException', (err) => {
-    console.error('Uncaught Exception:', err);
-  });
-  process.on('unhandledRejection', (err) => {
-    console.error('Unhandled Rejection:', err);
-  });
+// Graceful shutdown
+const server = app.listen(Number(PORT), '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
-  console.log('PORT env:', process.env.PORT);
-  console.log('DATABASE_URL set:', !!process.env.DATABASE_URL);
-
-  const server = app.listen(Number(PORT), '0.0.0.0', () => {
-    console.log(`Server running on 0.0.0.0:${PORT}`);
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down...');
+  server.close(() => {
+    prisma.$disconnect();
+    process.exit(0);
   });
-
-  server.on('error', (err) => {
-    console.error('Server error:', err);
-  });
-}
+});
 
 export default app;
