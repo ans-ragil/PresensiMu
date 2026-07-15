@@ -780,6 +780,7 @@ Agent Coding AI wajib patuhi aturan ini
 - **Status:** Implementasi diagnostic
 - **Observation:** Setelah routing fix aktif, login berubah dari platform 404 menjadi Express 500; health dasar tetap 200 dan CORS origin benar.
 - **Action:** Tambahkan `/api/health/database` untuk menguji koneksi tabel User dan RateLimitBucket secara terpisah tanpa mengekspos record atau credential.
+- **Production Result:** HTTP 503 dengan `users:error` dan `rateLimit:error`; routing/function/CORS sehat. Root cause berada pada Turso URL/token Vercel yang invalid, kedaluwarsa, terpotong, atau belum diperbarui setelah rotasi.
 
 ### 2026-07-15: Railway Pricing Clarification
 - **Status:** Selesai
