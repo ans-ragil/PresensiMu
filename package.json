@@ -1,0 +1,9 @@
+{
+  "name": "presensimu",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "cd client && npm ci && npm run build && cd ../server && npm ci && npx prisma generate && npm run build",
+    "start": "cd server && npm start"
+  }
+}
