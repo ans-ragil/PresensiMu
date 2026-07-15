@@ -730,3 +730,9 @@ Agent Coding AI wajib patuhi aturan ini
 ### 2026-07-15: Railway Frontend Access Guidance
 - **Status:** Selesai
 - **Detail:** Menetapkan bahwa frontend deployment gabungan diakses langsung dari root public domain Railway; `/api/*` hanya untuk backend dan route React seperti `/login` dilayani melalui SPA fallback.
+
+### 2026-07-15: Live Railway Domain Verification
+- **Status:** Backend sehat, frontend gagal termuat
+- **Domain:** `presensimu-production.up.railway.app`
+- **Results:** `/api/health` HTTP 200; `POST /api/auth/login` HTTP 200 dan credential admin valid; `/` dan `/login` HTTP 500 karena frontend `index.html` tidak tersedia dalam container.
+- **Conclusion:** Login backend/Turso bukan masalah. Railway masih menjalankan build context backend-only (`/server`) sehingga `client/dist` tidak ikut ter-build.
