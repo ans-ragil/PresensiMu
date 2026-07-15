@@ -702,3 +702,9 @@ Agent Coding AI wajib patuhi aturan ini
 - **QA Test:** Backend TypeScript clean, 121/121 tests pass, frontend production build sukses.
 - **Security Test:** `server/.env` tetap di-ignore Git; credentials tidak masuk commit.
 - **Deployment Requirement:** Untuk deploy frontend + backend dalam satu Railway service, Root Directory Railway harus dikosongkan atau `/`, bukan `/server`.
+
+### 2026-07-15: Railway Frontend Static Path Diagnosis
+- **Status:** Terdiagnosis
+- **Detail:** Container berjalan pada port 8080 tetapi gagal menemukan `/client/dist/index.html`.
+- **Root Cause:** Railway masih memakai service Root Directory `/server`, sehingga image dibangun dari `server/Dockerfile`; folder frontend tidak masuk Docker build context. Pada deployment gabungan yang benar, static file berada di `/app/client/dist/index.html`.
+- **Required Action:** Kosongkan Root Directory Railway atau set ke `/`, gunakan root `Dockerfile`, hapus build cache, lalu redeploy commit terbaru.
