@@ -85,8 +85,15 @@ if (process.env.VERCEL !== '1') {
     console.error('Unhandled Rejection:', err);
   });
 
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+  console.log('PORT env:', process.env.PORT);
+  console.log('DATABASE_URL set:', !!process.env.DATABASE_URL);
+
+  const server = app.listen(Number(PORT), '0.0.0.0', () => {
+    console.log(`Server running on 0.0.0.0:${PORT}`);
+  });
+
+  server.on('error', (err) => {
+    console.error('Server error:', err);
   });
 }
 
