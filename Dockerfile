@@ -12,9 +12,11 @@ RUN cd client && npm ci
 COPY client/ ./client/
 RUN cd client && npm run build
 
-# Copy server
+# Copy server - install correct platform binary
 COPY server/package*.json ./server/
-RUN cd server && npm install
+RUN cd server && npm install && \
+    npm install @libsql/linux-x64-gnu --save-optional && \
+    rm -rf node_modules/@libsql/linux-x64-musl
 
 COPY server/ ./server/
 RUN cd server && npx prisma generate
