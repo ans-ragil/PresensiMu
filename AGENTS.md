@@ -741,3 +741,7 @@ Agent Coding AI wajib patuhi aturan ini
 - **Status:** Belum berubah
 - **Results:** `/` dan `/login` masih HTTP 500; `/api/health` masih HTTP 200; login API masih HTTP 200.
 - **Conclusion:** Deployment aktif masih backend-only atau masih memakai cache/configuration lama. Perlu verifikasi visual Railway Root Directory dan Dockerfile Path.
+
+### 2026-07-15: Railway Pricing Clarification
+- **Status:** Selesai
+- **Detail:** Railway menyediakan trial satu kali dengan kredit terbatas, tetapi hosting berkelanjutan memerlukan plan berbayar/usage billing. Alternatif deployment gratis perlu dipertimbangkan bila tidak ingin biaya bulanan.
