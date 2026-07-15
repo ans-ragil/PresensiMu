@@ -20,6 +20,12 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Health check - FIRST, before any middleware
+app.get('/api/health', (_req, res) => {
+  console.log('Health check hit');
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // Middleware
 app.use(helmet());
 
@@ -41,16 +47,11 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Health check
-app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-
 // Rate limiting
 const authLimiter = rateLimit({
   windowMs: 5 * 60 * 1000,
   max: 20,
-  message: { success: false, message: 'Terlalu banyak percobaan, coba lagi dalam 5 menit' },
+  message: { success: false, message: 'Terlalu banyak percobaan' },
   standardHeaders: true,
   legacyHeaders: false
 });
@@ -68,17 +69,27 @@ app.use('/api/settings', settingsRoutes);
 // Error handler
 app.use(errorHandler);
 
-// Graceful shutdown
+// Start server
 const server = app.listen(Number(PORT), '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
 });
 
+// Graceful shutdown
 process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down...');
   server.close(() => {
     prisma.$disconnect();
     process.exit(0);
   });
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught:', err.message);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled:', reason);
+  process.exit(1);
 });
 
 export default app;
