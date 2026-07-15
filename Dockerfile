@@ -12,7 +12,7 @@ RUN cd client && npm ci
 COPY client/ ./client/
 RUN cd client && npm run build
 
-# Copy server - use npm install to regenerate platform-specific binaries
+# Copy server
 COPY server/package*.json ./server/
 RUN cd server && npm install
 
